@@ -5,8 +5,11 @@ import 'package:music_app/constants/routes.dart';
 import 'package:music_app/homePageWidgets/folder_button.dart';
 import 'package:music_app/homePageWidgets/mainmenu_button.dart';
 import 'package:music_app/music_view.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // FIRST: read and display music files, playlist names and stuff
+// Look into filemanager it uses permission_handler
+// look into sample code and maybe try it
 // widgets for later use: tabs
 
 void main() {
@@ -36,10 +39,10 @@ void main() {
           color: Color.fromRGBO(42, 41, 45, 1),
         ),
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
       routes: {
         musicRoute: (context) => const MusicView(),
-        musicListViewRoute: (context) => const MusicListView(),
+        musicListViewRoute: (context) => const MusicListViewer(),
       },
     ),
   );
@@ -74,7 +77,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: ListView(
         children: [
-          const MainMenuButton(icon: Icons.music_note_rounded, text: 'All songs'),
+          const MainMenuButton(
+            icon: Icons.music_note_rounded,
+            text: 'All songs',
+            routeName: musicListViewRoute,
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: Column(
@@ -129,8 +136,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          const MainMenuButton(icon: Icons.favorite_rounded, text: 'Favorites'),
-          const MainMenuButton(icon: Icons.timelapse_rounded, text: 'Recently played'),
+          const MainMenuButton(
+            icon: Icons.favorite_rounded,
+            text: 'Favorites',
+            routeName: "",
+          ),
+          const MainMenuButton(
+            icon: Icons.timelapse_rounded,
+            text: 'Recently played',
+            routeName: "",
+          ),
         ],
       ),
       bottomNavigationBar: const BottomMusicBar(
@@ -141,9 +156,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class MusicListView extends StatelessWidget {
-  const MusicListView({Key? key}) : super(key: key);
+class MusicListViewer extends StatefulWidget {
+  const MusicListViewer({Key? key}) : super(key: key);
 
+  @override
+  State<MusicListViewer> createState() => _MusicListViewerState();
+}
+
+class _MusicListViewerState extends State<MusicListViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,11 +183,76 @@ class MusicListView extends StatelessWidget {
           ],
         ),
       ),
-      body: ListView(),
+      body: ListView(
+        children: const [
+          MusicTile(
+            title: 'Song1',
+            artist: 'Artist1',
+            album: 'Album1',
+          ),
+          MusicTile(
+            title: 'Song2',
+            artist: 'Artist2',
+            album: 'Album2',
+          ),
+          MusicTile(
+            title: 'Song2',
+            artist: 'Artist2',
+            album: 'Album2',
+          ),
+        ],
+      ),
       bottomNavigationBar: const BottomMusicBar(
         songName: 'asdf',
         songArtist: 'asdf',
       ),
+    );
+  }
+}
+
+class MusicTile extends StatelessWidget {
+  const MusicTile({
+    Key? key,
+    required this.title,
+    required this.artist,
+    required this.album,
+  }) : super(key: key);
+
+  final String title;
+  final String artist;
+  final String album;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Dismissible(
+          direction: DismissDirection.endToStart,
+          background: Container(
+            color: Colors.green,
+          ),
+          confirmDismiss: (direction) async {
+            return false;
+          },
+          key: ValueKey<int>(0),
+          child: ListTile(
+            title: Text(title),
+            trailing: IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.more_vert_rounded),
+            ),
+            // visualDensity: VisualDensity(vertical: -4),
+            subtitle: Text('$artist - $album'),
+          ),
+        ),
+        const Divider(
+          height: 5,
+          thickness: 0.75,
+          indent: 10,
+          endIndent: 30,
+          color: Colors.grey,
+        ),
+      ],
     );
   }
 }

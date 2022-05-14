@@ -86,29 +86,54 @@ class MusicView extends StatelessWidget {
               ],
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 114),
-          //   child: Row(
-          //     crossAxisAlignment: CrossAxisAlignment.center,
-          //     children: [
-          //       Expanded(
-          //         child: Padding(
-          //           padding: const EdgeInsets.symmetric(horizontal: 20),
-          //           child: ProgressBar(
-          //             progressBarColor: const Color.fromARGB(255, 95, 148, 163),
-          //             thumbColor: const Color.fromARGB(255, 121, 180, 196),
-          //             progress: const Duration(milliseconds: 1000),
-          //             total: const Duration(milliseconds: 5000),
-          //             timeLabelLocation: TimeLabelLocation.above,
-          //             onSeek: (duration) {
-          //               print('User selected a new time: $duration');
-          //             },
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
+          Padding(
+            padding: const EdgeInsets.only(top: 114),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.only(left: 12),
+                          child: Text(
+                            '00:07',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        )
+                      ],
+                    ),
+                    Column(
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: Text(
+                            '02:37',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        activeColor: const Color.fromARGB(255, 196, 196, 196),
+                        inactiveColor: const Color.fromARGB(255, 75, 74, 74),
+                        value: 20,
+                        onChanged: (double value) {},
+                        max: 100,
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 50),
             child: Row(

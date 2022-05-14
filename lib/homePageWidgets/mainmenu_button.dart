@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:music_app/constants/routes.dart';
 
 class MainMenuButton extends StatelessWidget {
   const MainMenuButton({
     Key? key,
     required this.icon,
     required this.text,
+    required this.routeName,
   }) : super(key: key);
 
   final IconData icon;
   final String text;
+  final String routeName;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class MainMenuButton extends StatelessWidget {
               // fontFamily: 'Gothic A1',
             )),
         onPressed: () {
-          Navigator.pushNamed(context, musicListViewRoute);
+          Navigator.pushNamed(context, routeName);
         },
         child: Align(
           alignment: Alignment.centerLeft,
