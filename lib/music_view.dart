@@ -7,7 +7,8 @@ class MusicView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(42, 41, 45, 1),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
         flexibleSpace: GestureDetector(
           onPanUpdate: (details) {
             if (details.delta.dy > 0) {
@@ -25,69 +26,75 @@ class MusicView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              SizedBox(
-                height: 250,
-                width: 250,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(46))),
+          Flexible(
+            flex: 2,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AspectRatio(
+                  aspectRatio: 1 / 1,
+                  child: Image.asset(
+                    'assets/images/placeholder.png',
+                    height: 250,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: const [
-                      Text(
-                        'Song name',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          // fontFamily: 'Gothic A1',
-                        ),
-                      )
-                    ]),
-                    Row(children: const [
-                      Padding(
-                        padding: EdgeInsets.only(top: 13),
-                        child: Text(
-                          'Artist name',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
 
-                            // fontFamily: 'Gothic A1',
-                          ),
-                        ),
-                      )
-                    ]),
-                  ],
-                ),
-                Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.favorite_border_rounded),
-                      iconSize: 40,
-                      onPressed: () {},
-                    )
-                  ],
-                ),
+                // Image(image: Image.file('file'),)
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 114),
+          Flexible(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: const [
+                        Text(
+                          '[Song name]',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            // fontFamily: 'Gothic A1',
+                          ),
+                        )
+                      ]),
+                      Row(children: const [
+                        Padding(
+                          padding: EdgeInsets.only(top: 13),
+                          child: Text(
+                            '[Artist name]',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+
+                              // fontFamily: 'Gothic A1',
+                            ),
+                          ),
+                        )
+                      ]),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.favorite_border_rounded),
+                        iconSize: 40,
+                        onPressed: () {},
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -134,55 +141,52 @@ class MusicView extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 50),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.shuffle_rounded),
-                      iconSize: 30,
-                      onPressed: () {},
-                    )
-                  ],
-                ),
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.skip_previous_rounded),
-                          iconSize: 50,
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.play_circle_fill_rounded),
-                          iconSize: 70,
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.skip_next_rounded),
-                          iconSize: 50,
-                          onPressed: () {},
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.queue_music_rounded),
-                      iconSize: 30,
-                      onPressed: () {},
-                    )
-                  ],
-                )
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.shuffle_rounded),
+                    iconSize: 30,
+                    onPressed: () {},
+                  )
+                ],
+              ),
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.skip_previous_rounded),
+                        iconSize: 50,
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.play_circle_fill_rounded),
+                        iconSize: 70,
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.skip_next_rounded),
+                        iconSize: 50,
+                        onPressed: () {},
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              Column(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.queue_music_rounded),
+                    iconSize: 30,
+                    onPressed: () {},
+                  )
+                ],
+              )
+            ],
           ),
         ],
       ),

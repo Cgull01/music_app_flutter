@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_manager/controller/file_manager_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:music_app/bottom_music_bar.dart';
@@ -6,11 +9,16 @@ import 'package:music_app/homePageWidgets/folder_button.dart';
 import 'package:music_app/homePageWidgets/mainmenu_button.dart';
 import 'package:music_app/music_view.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:file_manager/file_manager.dart';
 
 // FIRST: read and display music files, playlist names and stuff
 // Look into filemanager it uses permission_handler
 // look into sample code and maybe try it
 // widgets for later use: tabs
+
+//       Future <Directory> dir = await getExternalStorageDirectory();
+// PROBLEM: can't read external storage
+// potential fix: path_provider library
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -164,6 +172,42 @@ class MusicListViewer extends StatefulWidget {
 }
 
 class _MusicListViewerState extends State<MusicListViewer> {
+  Directory dir = Directory('/storage/emulated/0/');
+  late final List<FileSystemEntity> _files = dir.listSync(recursive: true, followLinks: false);
+
+  final List<FileSystemEntity> _songs = [];
+  void readMusicFilesDirectory() {
+    for (FileSystemEntity entity in _files) {
+      print(entity);
+      String path = entity.path;
+      if (path.endsWith('.mp3')) _songs.add(entity);
+    }
+  }
+
+  void getFiles() async {
+    //asyn function to get list of files
+    setState(() {});
+    //update the UI
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkPermissionManageStorage();
+    readMusicFilesDirectory();
+  }
+
+  checkPermissionManageStorage() async {
+    var storageStatus = await Permission.storage.status;
+
+    if (!storageStatus.isGranted) await Permission.storage.request();
+
+    if (await Permission.storage.isGranted) {
+    } else {
+      // showToast("Provide Camera permission to use camera.", position: ToastPosition.bottom);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,25 +227,13 @@ class _MusicListViewerState extends State<MusicListViewer> {
           ],
         ),
       ),
-      body: ListView(
-        children: const [
-          MusicTile(
-            title: 'Song1',
-            artist: 'Artist1',
-            album: 'Album1',
-          ),
-          MusicTile(
-            title: 'Song2',
-            artist: 'Artist2',
-            album: 'Album2',
-          ),
-          MusicTile(
-            title: 'Song2',
-            artist: 'Artist2',
-            album: 'Album2',
-          ),
-        ],
+      body: ListView.builder(
+        itemCount: _songs.length,
+        itemBuilder: ((context, index) {
+          return MusicTile(title: _songs[index].path, artist: _songs[index].path, album: _songs[index].path);
+        }),
       ),
+      //
       bottomNavigationBar: const BottomMusicBar(
         songName: 'asdf',
         songArtist: 'asdf',
@@ -234,7 +266,7 @@ class MusicTile extends StatelessWidget {
           confirmDismiss: (direction) async {
             return false;
           },
-          key: ValueKey<int>(0),
+          key: const ValueKey<int>(0),
           child: ListTile(
             title: Text(title),
             trailing: IconButton(
