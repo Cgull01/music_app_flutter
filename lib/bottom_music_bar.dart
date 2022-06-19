@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:music_app/music_view.dart';
+import 'package:music_app/page_panager.dart';
 
 class BottomMusicBar extends StatelessWidget {
   const BottomMusicBar({
     Key? key,
-    required this.songName,
-    required this.songArtist,
+    required this.Pm,
   }) : super(key: key);
 
-  final String songName;
-  final String songArtist;
+  final PageManager Pm;
 
   @override
   Widget build(BuildContext context) {
+    var x;
+
+    if (Pm.currentSongDataNotifier.value['title'] == null) {
+      x = "no";
+    } else {
+      x = Pm.currentSongDataNotifier.value['title'];
+    }
+
+    print("Current value: ${x.toString()} <<<<<<<<< ");
+
+    return ValueListenableBuilder(
+      valueListenable: Pm.currentSongTitleNotifier,
+      builder: (_, data, __) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Text(data.toString(), style: const TextStyle(fontSize: 40)),
+        );
+      },
+    );
     return BottomAppBar(
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
@@ -61,7 +79,7 @@ class BottomMusicBar extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 5),
                               child: Text(
-                                songName,
+                                Pm.currentSongTitleNotifier.toString(),
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -69,7 +87,7 @@ class BottomMusicBar extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Text(songArtist),
+                            //Text(songArtist),
                           ],
                         )
                       ],
