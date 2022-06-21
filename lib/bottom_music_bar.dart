@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/main.dart';
 import 'package:music_app/music_view.dart';
+import 'package:music_app/notifiers/progress_notifier.dart';
 import 'package:music_app/page_panager.dart';
+import 'package:music_app/queue_view.dart';
+import 'globals.dart' as globals;
 
 class BottomMusicBar extends StatelessWidget {
   const BottomMusicBar({
@@ -12,138 +16,116 @@ class BottomMusicBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var x;
-
-    if (Pm.currentSongDataNotifier.value['title'] == null) {
-      x = "no";
-    } else {
-      x = Pm.currentSongDataNotifier.value['title'];
-    }
-
-    print("Current value: ${x.toString()} <<<<<<<<< ");
-
     return ValueListenableBuilder(
       valueListenable: Pm.currentSongTitleNotifier,
       builder: (_, data, __) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Text(data.toString(), style: const TextStyle(fontSize: 40)),
-        );
-      },
-    );
-    return BottomAppBar(
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          Navigator.push(context, _createRoute());
-        },
-        onPanUpdate: (details) {
-          if (details.delta.dy < 0) {
-            Navigator.push(context, _createRoute());
-          }
-        },
-        child: SizedBox(
-          height: 69,
-          child: Column(
-            children: [
-              const LinearProgressIndicator(
-                color: Color.fromARGB(255, 95, 148, 163),
-                backgroundColor: Color.fromRGBO(16, 16, 16, 1),
-                // value: 0,
-                minHeight: 4,
-                value: 0.7,
-              ),
-              Row(
+        return BottomAppBar(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              Navigator.push(context, globals.createRoute(MusicView()));
+            },
+            onPanUpdate: (details) {
+              if (details.delta.dy < 0) {
+                Navigator.push(context, globals.createRoute(MusicView()));
+              }
+            },
+            child: SizedBox(
+              height: 69,
+              width: MediaQuery.of(context).size.width,
+              child: Column(
                 children: [
-                  Column(
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          height: 47,
-                          width: 47,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(color: Colors.red),
-                          ),
-                        ),
-                      )
-                    ],
+                  ValueListenableBuilder<ProgressBarState>(
+                    valueListenable: globals.pageManager.progressNotifier,
+                    builder: (_, value, __) {
+                      return LinearProgressIndicator(
+                        color: Color.fromARGB(255, 95, 148, 163),
+                        backgroundColor: Color.fromRGBO(42, 41, 45, 1),
+                        minHeight: 4,
+                        value: getMusicProgress(value), //((value.total.inSeconds - value.current.inSeconds) / value.total.inSeconds),
+                      );
+                    },
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                Pm.currentSongTitleNotifier.toString(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  // fontFamily: 'Gothic A1',
-                                ),
+                  // const LinearProgressIndicator(
+                  //   color: Color.fromARGB(255, 95, 148, 163),
+                  //   backgroundColor: Color.fromRGBO(16, 16, 16, 1),
+                  //   // value: 0,
+                  //   minHeight: 4,
+                  //   value: 0.7,
+                  // ),
+                  Row(
+                    children: [
+                      Column(
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              height: 47,
+                              width: 47,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.red),
                               ),
                             ),
-                            //Text(songArtist),
+                          )
+                        ],
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Text(
+                                    globals.pageManager.getCurrentSongData('title'),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      // fontFamily: 'Gothic A1',
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  globals.pageManager.getCurrentSongData('artist'),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onPressed: () {},
-                        icon: const Icon(Icons.queue_music_rounded),
-                        iconSize: 30,
+                        ),
                       ),
-                      IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onPressed: () {},
-                        icon: const Icon(Icons.play_arrow_rounded),
-                        iconSize: 40,
-                      ),
-                      IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onPressed: () {},
-                        icon: const Icon(Icons.skip_next_rounded),
-                        iconSize: 30,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          QueueShowButton(),
+                          PlayButton(
+                            iconSize: 30,
+                          ),
+                          NextSongButton(
+                            iconSize: 30,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
-}
 
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const MusicView(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 0.75);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
+  double getMusicProgress(ProgressBarState value) {
+    if ((value.current.inSeconds / value.total.inSeconds) > 1 || (value.current.inSeconds / value.total.inSeconds).isNaN) {
+      return 0;
+    } else {
+      return value.current.inSeconds / value.total.inSeconds;
+    }
+  }
 }

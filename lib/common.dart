@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 class SeekBar extends StatefulWidget {
   final Duration duration;
   final Duration position;
-  final Duration bufferedPosition;
   final ValueChanged<Duration>? onChanged;
   final ValueChanged<Duration>? onChangeEnd;
 
@@ -13,7 +12,6 @@ class SeekBar extends StatefulWidget {
     Key? key,
     required this.duration,
     required this.position,
-    required this.bufferedPosition,
     this.onChanged,
     this.onChangeEnd,
   }) : super(key: key);
@@ -42,15 +40,13 @@ class _SeekBarState extends State<SeekBar> {
         SliderTheme(
           data: _sliderThemeData.copyWith(
             thumbShape: HiddenThumbComponentShape(),
-            activeTrackColor: Colors.blue.shade100,
-            inactiveTrackColor: Colors.grey.shade300,
+            activeTrackColor: Colors.grey,
           ),
           child: ExcludeSemantics(
             child: Slider(
               min: 0.0,
               max: widget.duration.inMilliseconds.toDouble(),
-              value: min(widget.bufferedPosition.inMilliseconds.toDouble(),
-                  widget.duration.inMilliseconds.toDouble()),
+              value: widget.duration.inMilliseconds.toDouble(),
               onChanged: (value) {
                 setState(() {
                   _dragValue = value;
@@ -70,13 +66,13 @@ class _SeekBarState extends State<SeekBar> {
         ),
         SliderTheme(
           data: _sliderThemeData.copyWith(
-            inactiveTrackColor: Colors.transparent,
+            inactiveTrackColor: Colors.grey,
+            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
           ),
           child: Slider(
             min: 0.0,
             max: widget.duration.inMilliseconds.toDouble(),
-            value: min(_dragValue ?? widget.position.inMilliseconds.toDouble(),
-                widget.duration.inMilliseconds.toDouble()),
+            value: min(_dragValue ?? widget.position.inMilliseconds.toDouble(), widget.duration.inMilliseconds.toDouble()),
             onChanged: (value) {
               setState(() {
                 _dragValue = value;
@@ -94,20 +90,22 @@ class _SeekBarState extends State<SeekBar> {
           ),
         ),
         Positioned(
-          right: 16.0,
-          bottom: 0.0,
-          child: Text(
-              RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                      .firstMatch("$_remaining")
-                      ?.group(1) ??
-                  '$_remaining',
-              style: Theme.of(context).textTheme.caption),
+          top: -2,
+          left: 22.0,
+          child:
+              Text(RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$').firstMatch("$_duration")?.group(1) ?? '$_duration', style: TextStyle(fontSize: 16)),
+        ),
+        Positioned(
+          top: -2,
+          right: 22.0,
+          child: Text(RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$').firstMatch("$_total")?.group(1) ?? '$_total', style: TextStyle(fontSize: 16)),
         ),
       ],
     );
   }
 
-  Duration get _remaining => widget.duration - widget.position;
+  Duration get _total => widget.duration;
+  Duration get _duration => widget.position;
 }
 
 class HiddenThumbComponentShape extends SliderComponentShape {
@@ -162,10 +160,7 @@ void showSliderDialog({
           child: Column(
             children: [
               Text('${snapshot.data?.toStringAsFixed(1)}$valueSuffix',
-                  style: const TextStyle(
-                      fontFamily: 'Fixed',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24.0)),
+                  style: const TextStyle(fontFamily: 'Fixed', fontWeight: FontWeight.bold, fontSize: 24.0)),
               Slider(
                 divisions: divisions,
                 min: min,

@@ -55,6 +55,10 @@ class PageManager {
     //_audioPlayer.setAudioSource(_playlist);
   }
 
+  int GetIndex() {
+    return _audioPlayer.currentIndex ?? -1;
+  }
+
   void PlaySelectedSong(musicData m) async {
     print("playing ${m.Title}");
     //_playlist.add(AudioSource.uri(m.songPath.uri));
@@ -73,7 +77,10 @@ class PageManager {
 
     await _audioPlayer.setAudioSource(_playlist);
     await _audioPlayer.seek(Duration.zero, index: index);
-    //_audioPlayer.load();
+
+    if (_audioPlayer.playing == false) {
+      play();
+    }
   }
 
   void setPlaylist(List<musicData> P) async {
@@ -94,19 +101,6 @@ class PageManager {
 
     await _audioPlayer.setAudioSource(_playlist);
   }
-
-  // void _setInitialPlaylist() async {
-  //   const prefix = 'https://www.soundhelix.com/examples/mp3';
-  //   final song1 = Uri.parse('$prefix/SoundHelix-Song-1.mp3');
-  //   final song2 = Uri.parse('$prefix/SoundHelix-Song-2.mp3');
-  //   final song3 = Uri.parse('$prefix/SoundHelix-Song-3.mp3');
-  //   _playlist = ConcatenatingAudioSource(children: [
-  //     AudioSource.uri(song1, tag: AudioMetadata(album: "", title: 'Song 1', artwork: '')),
-  //     AudioSource.uri(song2, tag: AudioMetadata(album: "", title: 'Song 22', artwork: '')),
-  //     AudioSource.uri(song3, tag: AudioMetadata(album: "", title: 'Song 3', artwork: '')),
-  //   ]);
-  //   await _audioPlayer.setAudioSource(_playlist);
-  // }
 
   void _listenForChangesInPlayerState() {
     _audioPlayer.playerStateStream.listen((playerState) {
@@ -177,10 +171,14 @@ class PageManager {
       final playlist = sequenceState.effectiveSequence;
 
       List<musicData> titles = [];
-      for (var p in playlist) {
+      for (int i = 0; i < playlist.length; i++) {
+        var p = playlist[i];
         if (p.tag != null) {
           var c = p.tag as musicData;
-          titles.add(c);
+
+          if (i >= GetIndex()) {
+            titles.add(c);
+          }
         }
       }
 
@@ -246,6 +244,14 @@ class PageManager {
       await _audioPlayer.shuffle();
     }
     await _audioPlayer.setShuffleModeEnabled(enable);
+  }
+
+  String getCurrentSongData(String key) {
+    if (currentSongDataNotifier.value['title'] == null) {
+      return "ERROR: missing key: {$key}";
+    } else {
+      return currentSongDataNotifier.value[key];
+    }
   }
 
   // void addSong() {

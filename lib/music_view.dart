@@ -1,4 +1,15 @@
+import 'dart:collection';
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:marquee/marquee.dart';
+import 'package:music_app/page_panager.dart';
+import 'package:music_app/main.dart';
+import 'globals.dart' as globals;
+
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MusicView extends StatelessWidget {
   const MusicView({Key? key}) : super(key: key);
@@ -24,171 +35,221 @@ class MusicView extends StatelessWidget {
           },
         ),
       ),
-      body: Column(
-        children: [
-          Flexible(
-            flex: 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AspectRatio(
-                  aspectRatio: 1 / 1,
-                  child: Image.asset(
-                    'assets/images/placeholder.png',
-                    height: 250,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-
-                // Image(image: Image.file('file'),)
-              ],
-            ),
-          ),
-          Flexible(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: const [
-                        Text(
-                          '[Song name]',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            // fontFamily: 'Gothic A1',
-                          ),
-                        )
-                      ]),
-                      Row(children: const [
-                        Padding(
-                          padding: EdgeInsets.only(top: 13),
-                          child: Text(
-                            '[Artist name]',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-
-                              // fontFamily: 'Gothic A1',
-                            ),
-                          ),
-                        )
-                      ]),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.favorite_border_rounded),
-                        iconSize: 40,
-                        onPressed: () {},
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Flexible(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 12),
-                          child: Text(
-                            '00:07',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        )
-                      ],
-                    ),
-                    Column(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(right: 12),
-                          child: Text(
-                            '02:37',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Slider(
-                        activeColor: const Color.fromARGB(255, 196, 196, 196),
-                        inactiveColor: const Color.fromARGB(255, 75, 74, 74),
-                        value: 20,
-                        onChanged: (double value) {},
-                        max: 100,
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: ValueListenableBuilder(
+        valueListenable: globals.pageManager.currentSongTitleNotifier,
+        builder: (_, data, __) {
+          return Column(
             children: [
-              Column(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.shuffle_rounded),
-                    iconSize: 30,
-                    onPressed: () {},
-                  )
-                ],
+              Flexible(
+                flex: 5,
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(right: (MediaQuery.of(context).size.width / 10)),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: const Icon(Icons.favorite_border_rounded),
+                          iconSize: 30,
+                          onPressed: () {},
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/images/CenterCircle.svg',
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        color: Color.fromARGB(30, 236, 132, 21),
+                      ),
+                    ),
+                    const MyStatefulWidget(fileName: 'assets/images/OffsetCircle1.svg'),
+                    const MyStatefulWidget(fileName: 'assets/images/OffsetCircle2.svg'),
+                    const MyStatefulWidget(fileName: 'assets/images/OffsetCircle3.svg'),
+                    Align(
+                      alignment: Alignment.center,
+                      child: CircleAvatar(
+                        radius: MediaQuery.of(context).size.width / 4,
+                        backgroundImage: const AssetImage('assets/images/placeholder.png'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              Column(
-                children: [
-                  Row(
+              Flexible(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.skip_previous_rounded),
-                        iconSize: 50,
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.play_circle_fill_rounded),
-                        iconSize: 70,
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.skip_next_rounded),
-                        iconSize: 50,
-                        onPressed: () {},
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            Text(
+                              globals.pageManager.getCurrentSongData('title'),
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Gothic A1',
+                              ),
+                            )
+                          ]),
+                          Row(children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 13),
+                              child: Text(
+                                globals.pageManager.getCurrentSongData('artist'),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Gothic A1',
+                                ),
+                              ),
+                            )
+                          ]),
+                        ],
                       ),
                     ],
-                  )
-                ],
+                  ),
+                ),
               ),
-              Column(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.queue_music_rounded),
-                    iconSize: 30,
-                    onPressed: () {},
-                  )
-                ],
-              )
+              Flexible(
+                flex: 4,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: const Color.fromRGBO(42, 41, 45, 1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: const [
+                            Expanded(
+                              child: AudioProgressBar(),
+                            )
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: const [
+                                ShuffleButton(
+                                  iconSize: 32,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: const [
+                                    PreviousSongButton(
+                                      iconSize: 36,
+                                    ),
+                                    PlayButton(
+                                      iconSize: 64,
+                                    ),
+                                    NextSongButton(
+                                      iconSize: 36,
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                const QueueShowButton(),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                height: 5,
+                                thickness: 0.75,
+                                indent: 20,
+                                endIndent: 20,
+                                color: Colors.grey.shade800,
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.more_vert_rounded),
+                              iconSize: 30,
+                              onPressed: () async {},
+                            ),
+                            const Text("Next up: song1 • song 2 • song3 and 3 more")
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
-          ),
-        ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class MyStatefulWidget extends StatefulWidget {
+  final String fileName;
+
+  const MyStatefulWidget({Key? key, required this.fileName}) : super(key: key);
+
+  @override
+  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+}
+
+/// AnimationControllers can be created with `vsync: this` because of TickerProviderStateMixin.
+class _MyStatefulWidgetState extends State<MyStatefulWidget> with TickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 10),
+    vsync: this,
+  )..repeat(reverse: false);
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.linear,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RotationTransition(
+      turns: _animation,
+      child: Align(
+        alignment: Alignment.center,
+        child: SvgPicture.asset(
+          widget.fileName,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Color.fromARGB(45, 144, 121, 95),
+        ),
       ),
     );
   }
