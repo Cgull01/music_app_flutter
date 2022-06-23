@@ -1,18 +1,23 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_app/main.dart';
-
+import 'package:music_app/globals.dart';
 import 'notifiers/play_button_notifier.dart';
 import 'notifiers/progress_notifier.dart';
 import 'notifiers/repeat_button_notifier.dart';
+import 'notifiers/queue_button_notifier.dart';
+import 'dart:developer' as dev_tools show log;
 
 class PageManager {
   final currentSongTitleNotifier = ValueNotifier<String>('');
-  final playlistNotifier = ValueNotifier<List<musicData>>([]);
+  final playlistNotifier = ValueNotifier<List<MusicData>>([]);
   final progressNotifier = ProgressNotifier();
   final repeatButtonNotifier = RepeatButtonNotifier();
   final isFirstSongNotifier = ValueNotifier<bool>(true);
+
   final playButtonNotifier = PlayButtonNotifier();
+  final queueButtonNotifier = QueueButtonNotifier();
+
   final isLastSongNotifier = ValueNotifier<bool>(true);
   final isShuffleModeEnabledNotifier = ValueNotifier<bool>(false);
 
@@ -28,6 +33,10 @@ class PageManager {
   void _init() async {
     _audioPlayer = AudioPlayer();
     _playlist = ConcatenatingAudioSource(children: []);
+
+    _audioPlayer.playbackEventStream.listen((event) {}, onError: (Object e, StackTrace stackTrace) {
+      log("Error occured: $e");
+    });
     //_setInitialPlaylist();
     _listenForChangesInPlayerState();
     _listenForChangesInPlayerPosition();
@@ -36,33 +45,29 @@ class PageManager {
     _listenForChangesInSequenceState();
   }
 
-  void AddToQueue(musicData m) {
-    print("added ${m.Title} to queue");
+  void stop() {
+    _audioPlayer.stop();
+  }
 
-    var index;
-    if (_audioPlayer.currentIndex == null) {
-      index = _playlist.length;
-    } else {
-      index = _audioPlayer.currentIndex! + 1;
-    }
+  void addToQueue(MusicData m) {
+    dev_tools.log("added ${m.title} to queue");
+
     _playlist.insert(
         _playlist.length,
         AudioSource.uri(
           m.songPath.uri,
-          tag: musicData(songPath: m.songPath, Album: m.Album ?? "", Title: m.Title ?? "", Artist: m.Artist ?? ''),
+          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title ?? "", artist: m.artist ?? ''),
         ));
-
-    //_audioPlayer.setAudioSource(_playlist);
   }
 
-  int GetIndex() {
+  int getIndex() {
     return _audioPlayer.currentIndex ?? -1;
   }
 
-  void PlaySelectedSong(musicData m) async {
-    print("playing ${m.Title}");
+  void playSelectedSong(MusicData m) async {
+    dev_tools.log("playing ${m.title} index: ${getIndex()}");
     //_playlist.add(AudioSource.uri(m.songPath.uri));
-    var index;
+    int index;
     if (_audioPlayer.currentIndex == null) {
       index = _playlist.length;
     } else {
@@ -72,32 +77,28 @@ class PageManager {
         index,
         AudioSource.uri(
           m.songPath.uri,
-          tag: musicData(songPath: m.songPath, Album: m.Album ?? "", Title: m.Title ?? "", Artist: m.Artist ?? ''),
+          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title ?? "", artist: m.artist ?? ''),
         ));
 
     await _audioPlayer.setAudioSource(_playlist);
     await _audioPlayer.seek(Duration.zero, index: index);
 
-    if (_audioPlayer.playing == false) {
+    if (_audioPlayer.playing == false && _playlist.length == 1) {
       play();
     }
   }
 
-  void setPlaylist(List<musicData> P) async {
+  void setPlaylist(List<MusicData> P) async {
     _playlist = ConcatenatingAudioSource(
       children: P
           .map(
             (item) => AudioSource.uri(
               item.songPath.uri,
-              tag: musicData(songPath: item.songPath, Album: item.Album ?? "", Title: item.Title ?? "", Artist: item.Artist ?? ''),
+              tag: MusicData(songPath: item.songPath, album: item.album ?? "", title: item.title ?? "", artist: item.artist ?? ''),
             ),
           )
           .toList(),
     );
-
-    for (int i = 0; i < P.length; i++) {
-      print('$i : ${P[i].Title}');
-    }
 
     await _audioPlayer.setAudioSource(_playlist);
   }
@@ -156,34 +157,35 @@ class PageManager {
     _audioPlayer.sequenceStateStream.listen((sequenceState) {
       if (sequenceState == null) return;
 
+      dev_tools.log('Sequence state changed');
+
       // update current song title
       final currentItem = sequenceState.currentSource;
-      final t = currentItem?.tag as musicData;
-      currentSongTitleNotifier.value = t.Title.toString();
+      final t = currentItem?.tag as MusicData;
+      currentSongTitleNotifier.value = t.title.toString();
 
       currentSongDataNotifier.value = {
-        'title': t.Title.toString(),
-        'artist': t.Artist.toString(),
-        'album': t.Album.toString(),
+        'title': t.title.toString(),
+        'artist': t.artist.toString(),
+        'album': t.album.toString(),
       };
 
       // update playlist
       final playlist = sequenceState.effectiveSequence;
-
-      List<musicData> titles = [];
+      List<MusicData> titles = [];
       for (int i = 0; i < playlist.length; i++) {
         var p = playlist[i];
         if (p.tag != null) {
-          var c = p.tag as musicData;
+          var c = p.tag as MusicData;
 
-          if (i >= GetIndex()) {
-            titles.add(c);
-          }
+          // if (i >= GetIndex()) {
+          //   titles.add(c);
+          // }
+          titles.add(c);
         }
       }
 
       //final titles = playlist.map((item) => item.tag as musicData).toList();
-
       playlistNotifier.value = titles;
 
       // update shuffle mode
@@ -246,6 +248,14 @@ class PageManager {
     await _audioPlayer.setShuffleModeEnabled(enable);
   }
 
+  void bringSongToQueueTop(int index, MusicData m) {
+    dev_tools.log("moved ${m.title} to the top");
+
+    _playlist.removeAt(index);
+
+    playSelectedSong(m);
+  }
+
   String getCurrentSongData(String key) {
     if (currentSongDataNotifier.value['title'] == null) {
       return "ERROR: missing key: {$key}";
@@ -261,9 +271,9 @@ class PageManager {
   //   _playlist.add(AudioSource.uri(song, tag: AudioMetadata(album: "", title: "Song ${songNumber}", artwork: '')));
   // }
 
-  void removeSong() {
-    final index = _playlist.length - 1;
-    if (index < 0) return;
+  void removeFromQueue(int index) {
+    dev_tools.log('Removed song from the queue');
+
     _playlist.removeAt(index);
   }
 }

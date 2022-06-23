@@ -14,23 +14,14 @@ class FolderButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(top: 6, bottom: 6, left: 6),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-          color: Colors.white.withOpacity(0.05),
-          spreadRadius: 1,
-          blurRadius: 2,
-          offset: const Offset(-2, -2), // changes position of shadow
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(width: 1.5, color: Color.fromARGB(255, 130, 130, 130)),
         ),
-        BoxShadow(
-          color: Colors.black.withOpacity(0.8),
-          spreadRadius: 1,
-          blurRadius: 2,
-          offset: const Offset(2.5, 3), // changes position of shadow
-        ),
-      ]),
+      ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          primary: const Color.fromRGBO(16, 16, 16, 1),
+          primary: Color.fromARGB(255, 34, 33, 33),
           minimumSize: const Size(114, 70),
         ),
         onPressed: () {},

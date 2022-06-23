@@ -1,13 +1,8 @@
-import 'dart:collection';
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:marquee/marquee.dart';
-import 'package:music_app/page_panager.dart';
-import 'package:music_app/main.dart';
-import 'globals.dart' as globals;
+import 'package:music_app/widgets/bottom_music_bar.dart';
+import 'package:music_app/widgets/common.dart';
+import 'package:music_app/notifiers/progress_notifier.dart';
+import '../globals.dart' as globals;
 
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -61,12 +56,12 @@ class MusicView extends StatelessWidget {
                         'assets/images/CenterCircle.svg',
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height,
-                        color: Color.fromARGB(30, 236, 132, 21),
+                        color: const Color.fromARGB(30, 236, 132, 21),
                       ),
                     ),
-                    const MyStatefulWidget(fileName: 'assets/images/OffsetCircle1.svg'),
-                    const MyStatefulWidget(fileName: 'assets/images/OffsetCircle2.svg'),
-                    const MyStatefulWidget(fileName: 'assets/images/OffsetCircle3.svg'),
+                    const SongPictureAccent(fileName: 'assets/images/OffsetCircle1.svg'),
+                    const SongPictureAccent(fileName: 'assets/images/OffsetCircle2.svg'),
+                    const SongPictureAccent(fileName: 'assets/images/OffsetCircle3.svg'),
                     Align(
                       alignment: Alignment.center,
                       child: CircleAvatar(
@@ -122,8 +117,8 @@ class MusicView extends StatelessWidget {
                 flex: 4,
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: const Color.fromRGBO(42, 41, 45, 1),
-                    borderRadius: const BorderRadius.only(
+                    color: Color.fromRGBO(42, 41, 45, 1),
+                    borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
@@ -169,8 +164,8 @@ class MusicView extends StatelessWidget {
                               ],
                             ),
                             Column(
-                              children: [
-                                const QueueShowButton(),
+                              children: const [
+                                QueueButton(),
                               ],
                             ),
                           ],
@@ -212,17 +207,17 @@ class MusicView extends StatelessWidget {
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
+class SongPictureAccent extends StatefulWidget {
   final String fileName;
 
-  const MyStatefulWidget({Key? key, required this.fileName}) : super(key: key);
+  const SongPictureAccent({Key? key, required this.fileName}) : super(key: key);
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<SongPictureAccent> createState() => _SongPictureAccentState();
 }
 
 /// AnimationControllers can be created with `vsync: this` because of TickerProviderStateMixin.
-class _MyStatefulWidgetState extends State<MyStatefulWidget> with TickerProviderStateMixin {
+class _SongPictureAccentState extends State<SongPictureAccent> with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     duration: const Duration(seconds: 10),
     vsync: this,
@@ -248,9 +243,26 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with TickerProvider
           widget.fileName,
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          color: Color.fromARGB(45, 144, 121, 95),
+          color: const Color.fromARGB(45, 144, 121, 95),
         ),
       ),
+    );
+  }
+}
+
+class AudioProgressBar extends StatelessWidget {
+  const AudioProgressBar({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<ProgressBarState>(
+      valueListenable: globals.pageManager.progressNotifier,
+      builder: (_, value, __) {
+        return SeekBar(
+          position: value.current,
+          duration: value.total,
+          onChangeEnd: globals.pageManager.seek,
+        );
+      },
     );
   }
 }

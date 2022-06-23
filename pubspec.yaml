@@ -44,6 +44,7 @@ dependencies:
   just_audio_libwinmedia: ^0.0.4
   marquee: ^2.2.3
   flutter_svg: ^1.1.0
+  on_audio_query: ^2.6.1
 
 
 dev_dependencies:

@@ -1,33 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:music_app/main.dart';
-import 'package:music_app/music_view.dart';
+import 'package:music_app/widgets/common.dart' show PlayButton, NextSongButton;
+import 'package:music_app/views/music_view.dart';
 import 'package:music_app/notifiers/progress_notifier.dart';
-import 'package:music_app/page_panager.dart';
-import 'package:music_app/queue_view.dart';
-import 'globals.dart' as globals;
+import 'package:music_app/notifiers/queue_button_notifier.dart';
+import 'package:music_app/views/queue_view.dart';
+import '../globals.dart' as globals;
 
 class BottomMusicBar extends StatelessWidget {
   const BottomMusicBar({
     Key? key,
-    required this.Pm,
   }) : super(key: key);
-
-  final PageManager Pm;
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: Pm.currentSongTitleNotifier,
+      valueListenable: globals.pageManager.currentSongTitleNotifier,
       builder: (_, data, __) {
         return BottomAppBar(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () {
-              Navigator.push(context, globals.createRoute(MusicView()));
+              Navigator.push(context, globals.createRoute(const MusicView()));
             },
             onPanUpdate: (details) {
               if (details.delta.dy < 0) {
-                Navigator.push(context, globals.createRoute(MusicView()));
+                Navigator.push(context, globals.createRoute(const MusicView()));
               }
             },
             child: SizedBox(
@@ -39,8 +36,8 @@ class BottomMusicBar extends StatelessWidget {
                     valueListenable: globals.pageManager.progressNotifier,
                     builder: (_, value, __) {
                       return LinearProgressIndicator(
-                        color: Color.fromARGB(255, 95, 148, 163),
-                        backgroundColor: Color.fromRGBO(42, 41, 45, 1),
+                        color: const Color.fromARGB(255, 95, 148, 163),
+                        backgroundColor: const Color.fromRGBO(42, 41, 45, 1),
                         minHeight: 4,
                         value: getMusicProgress(value), //((value.total.inSeconds - value.current.inSeconds) / value.total.inSeconds),
                       );
@@ -100,8 +97,8 @@ class BottomMusicBar extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          QueueShowButton(),
+                        children: const [
+                          QueueButton(),
                           PlayButton(
                             iconSize: 30,
                           ),
@@ -128,4 +125,54 @@ class BottomMusicBar extends StatelessWidget {
       return value.current.inSeconds / value.total.inSeconds;
     }
   }
+}
+
+class QueueButton extends StatelessWidget {
+  const QueueButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<QueueState>(
+        valueListenable: globals.pageManager.queueButtonNotifier,
+        builder: (_, isActive, __) {
+          switch (isActive) {
+            case QueueState.active:
+              return IconButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                color: Colors.red,
+                onPressed: () {
+                  globals.pageManager.queueButtonNotifier.value = QueueState.inactive;
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.queue_music_rounded),
+                iconSize: 30,
+              );
+
+            case QueueState.inactive:
+              return IconButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onPressed: () {
+                  globals.pageManager.queueButtonNotifier.value = QueueState.active;
+                  Navigator.push(context, globals.createRoute(const QueueView()));
+                },
+                icon: const Icon(Icons.queue_music_rounded),
+                iconSize: 30,
+              );
+          }
+        });
+  }
+  // @override
+  // Widget build(BuildContext context) {
+  //   return IconButton(
+  //     splashColor: Colors.transparent,
+  //     highlightColor: Colors.transparent,
+  //     onPressed: () {
+  //       Navigator.push(context, globals.createRoute(QueueView()));
+  //     },
+  //     icon: const Icon(Icons.queue_music_rounded),
+  //     iconSize: 30,
+  //   );
+  // }
 }

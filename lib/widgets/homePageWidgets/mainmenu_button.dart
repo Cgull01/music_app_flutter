@@ -21,29 +21,20 @@ class MainMenuButton extends StatelessWidget {
         top: 33,
       ),
       child: Container(
-        decoration: BoxDecoration(boxShadow: [
-          BoxShadow(
-            color: Colors.white.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 2,
-            offset: Offset(-2, -3), // changes position of shadow
+        decoration: const BoxDecoration(
+          border: Border(
+            left: BorderSide(width: 4.0, color: Colors.white),
           ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.8),
-            spreadRadius: 1,
-            blurRadius: 2,
-            offset: Offset(2.5, 3), // changes position of shadow
-          ),
-        ]),
+        ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: Color.fromRGBO(16, 16, 16, 1),
+            primary: const Color.fromARGB(255, 34, 33, 33),
             minimumSize: const Size(311, 63),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5), // <-- Radius
             ),
             textStyle: const TextStyle(
-              fontSize: 32,
+              fontSize: 27,
               fontWeight: FontWeight.bold,
               // fontFamily: 'Gothic A1',
             ),
@@ -51,14 +42,17 @@ class MainMenuButton extends StatelessWidget {
           onPressed: () {
             Navigator.pushNamed(context, routeName);
           },
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                Icon(icon, size: 30),
-                Text(text),
-              ],
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, size: 27),
+                  Text(' $text'),
+                ],
+              ),
+              const Icon(Icons.keyboard_arrow_right, size: 30),
+            ],
           ),
         ),
       ),
