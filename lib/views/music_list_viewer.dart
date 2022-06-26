@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:music_app/widgets/alphabet_scroll_page.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;
 
@@ -17,6 +18,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
     super.initState();
   }
 
+  List items = ['yes', 'no', 'maybe'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,14 +44,17 @@ class _MusicListViewerState extends State<MusicListViewer> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Expanded(
+          //   child: ListView.builder(
+          //     itemCount: globals.allsongs.length,
+          //     itemBuilder: ((context, index) {
+          //       return MusicTile(mData: globals.allsongs[index], index: index);
+          //     }),
+          //   ),
+          // ),
           Expanded(
-            child: ListView.builder(
-              itemCount: globals.allsongs.length,
-              itemBuilder: ((context, index) {
-                return MusicTile(mData: globals.allsongs[index], index: index);
-              }),
-            ),
-          ),
+            child: AlphabetScrollPage(items: globals.allsongs.map((e) => e.title).toList()),
+          )
         ],
       ),
       bottomNavigationBar: const BottomMusicBar(),

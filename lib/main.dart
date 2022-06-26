@@ -58,7 +58,7 @@ FIRST:
   V display buttons after loading, maybe add loading screen
   V Show icon instead of circular progress indicator
   - focus on creating fast loading time, asynchronous code
-  O add alphabet on music list view REMOVE DUPLICATES
+  O add alphabet on music list view import 'package:alphabet_list_scroll_view/alphabet_list_scroll_view.dart';
   - be able to open different folders
   - add music deletion
   - search bar
