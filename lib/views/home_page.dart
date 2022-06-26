@@ -29,11 +29,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: ListView(
+      body: Column(
         children: [
           MainMenuButton(
             icon: Icons.music_note_rounded,
-            text: 'All songs',
+            text: 'All songs ${globals.allsongs.length}',
             routeName: musicListViewRoute,
           ),
           Padding(
@@ -59,43 +59,28 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 SizedBox(
-                  height: 60,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: const [
-                      FolderButton(
-                        title: 'folder1',
-                        songCount: '123',
-                      ),
-                      SizedBox(
-                        width: 18,
-                      ),
-                      FolderButton(
-                        title: 'folder2',
-                        songCount: '312',
-                      ),
-                      SizedBox(
-                        width: 18,
-                      ),
-                      FolderButton(
-                        title: 'folder3',
-                        songCount: '123',
-                      ),
-                      SizedBox(
-                        width: 18,
-                      ),
-                    ],
+                  height: MediaQuery.of(context).size.height / 4,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    reverse: false,
+                    itemCount: globals.playLists.length,
+                    itemBuilder: (context, index) {
+                      return FolderButton(
+                        title: globals.playLists[index].title,
+                        songCount: globals.playLists[index].songs.length.toString(),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          MainMenuButton(
+          const MainMenuButton(
             icon: Icons.favorite_rounded,
             text: 'Favorites',
             routeName: "",
           ),
-          MainMenuButton(
+          const MainMenuButton(
             icon: Icons.timelapse_rounded,
             text: 'Recently played',
             routeName: "",

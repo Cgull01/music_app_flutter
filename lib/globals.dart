@@ -1,6 +1,7 @@
 library globals;
 
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:music_app/page_manager.dart';
@@ -31,16 +32,19 @@ List<Playlist> playLists = [];
 
 int selectedPlaylistIndex = 0;
 
+final allPlaylistsNotifier = ValueNotifier<List<Playlist>>([]);
+final testingBool = ValueNotifier<bool>(true);
+
 class MusicData {
   final FileSystemEntity songPath;
-  final String? title;
+  final String title;
   final String? artist;
   final String? album;
   final String? artwork;
 
   MusicData({
     required this.songPath,
-    this.title,
+    required this.title,
     this.artist,
     this.album,
     this.artwork,

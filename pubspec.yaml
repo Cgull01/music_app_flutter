@@ -45,6 +45,7 @@ dependencies:
   marquee: ^2.2.3
   flutter_svg: ^1.1.0
   on_audio_query: ^2.6.1
+  flutter_native_splash: ^2.2.3+1
 
 
 dev_dependencies:
@@ -78,6 +79,9 @@ flutter:
     - assets/images/OffsetCircle1.svg
     - assets/images/OffsetCircle2.svg
     - assets/images/OffsetCircle3.svg
+    - assets/images/icon.png
+    - assets/images/appLogo.png
+    - assets/images/appLogo.svg
 
   #   - images/a_dot_ham.jpeg
 
@@ -106,3 +110,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_native_splash:
+  color: "#191919"
+  image: assets/images/icon.png
+  android: true
+  ios: true

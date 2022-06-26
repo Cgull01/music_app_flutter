@@ -163,16 +163,4 @@ class QueueButton extends StatelessWidget {
           }
         });
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return IconButton(
-  //     splashColor: Colors.transparent,
-  //     highlightColor: Colors.transparent,
-  //     onPressed: () {
-  //       Navigator.push(context, globals.createRoute(QueueView()));
-  //     },
-  //     icon: const Icon(Icons.queue_music_rounded),
-  //     iconSize: 30,
-  //   );
-  // }
 }

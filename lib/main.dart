@@ -1,10 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:music_app/globals.dart';
 import 'package:music_app/views/home_page.dart';
 import 'package:music_app/views/music_list_viewer.dart';
@@ -19,7 +17,9 @@ import 'package:id3/id3.dart';
 import 'package:music_app/constants/routes.dart';
 import 'package:music_app/views/music_view.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // FIRST: read and display music files, playlist names and stuff
 // Look into filemanager it uses permission_handler
@@ -53,10 +53,12 @@ import 'package:on_audio_query/on_audio_query.dart';
 /*
 Focusing on wrong things:
 FIRST:
-  - fix file structure, clean code
-  - display buttons after loading, maybe add loading screen
+  V fix file structure, clean code
+  V Playlists listener to update folders after loading
+  V display buttons after loading, maybe add loading screen
+  V Show icon instead of circular progress indicator
   - focus on creating fast loading time, asynchronous code
-  - add alphabet on music list view
+  O add alphabet on music list view REMOVE DUPLICATES
   - be able to open different folders
   - add music deletion
   - search bar
@@ -69,6 +71,7 @@ SECOND:
   - song sorting
 
 */
+
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -89,16 +92,27 @@ void main() {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  late Image image1;
   @override
   void initState() {
     super.initState();
-
+    image1 = Image.asset(
+      'assets/images/appLogo.png',
+      height: 150,
+      width: 150,
+    );
     WidgetsBinding.instance.addObserver(this);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
     ));
 
     _init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    precacheImage(image1.image, context);
+    super.didChangeDependencies();
   }
 
   Directory dir = Directory('/storage/emulated/0/');
@@ -116,35 +130,140 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
         String currentFolderTitle = entity.path.split('/').elementAt(entity.path.split('/').length - 2);
 
+        final regex = RegExp("([^/]+)/?\$");
+
         // creates a new music folder
         if (previousFolderTitle != currentFolderTitle && previousFolderTitle != null) {
           PL.title = previousFolderTitle;
 
           setState(() {
-            // ! probably setting the state is bad everytime we get new song
-            playLists.add(PL);
+            globals.playLists.add(PL);
+            globals.allPlaylistsNotifier.value = globals.playLists;
+            log('Value notifier updated');
           });
           PL = Playlist(title: '', songs: []);
         } else // adds a new song to playlist
         if (previousFolderTitle == currentFolderTitle && previousFolderTitle != null) {
           if (mp3instance.parseTagsSync()) {
             // log('${mp3instance.metaTags['APIC']['base64'].toString()}');
-            PL.songs.add(MusicData(
-              songPath: entity,
-              title: mp3instance.metaTags['Title'].toString(),
-              artist: mp3instance.metaTags['Artist'],
-              album: mp3instance.metaTags['Album'],
-              // Artwork: mp3instance.metaTags['APIC']['base64'],
-            ));
+            globals.allsongs.add(
+              MusicData(
+                songPath: entity,
+                title: mp3instance.metaTags['Title'].toString() == "null"
+                    ? regex.firstMatch(entity.path)!.group(0).toString()
+                    : mp3instance.metaTags['Title'].toString(),
+                artist: mp3instance.metaTags['Artist'] == "null" ? "Unknown artist" : mp3instance.metaTags['Artist'],
+                album: mp3instance.metaTags['Album'] == "null" ? "Unknown album" : mp3instance.metaTags['Album'],
+                // artwork: mp3instance.metaTags['APIC']['base64'],
+              ),
+            );
+            // log("added ${globals.allsongs[globals.allsongs.length - 1].title} ${entity.path}");
+            PL.songs.add(
+              MusicData(
+                songPath: entity,
+                title: mp3instance.metaTags['Title'].toString(),
+                artist: mp3instance.metaTags['Artist'],
+                album: mp3instance.metaTags['Album'],
+                // artwork: mp3instance.metaTags['APIC']['base64'],
+              ),
+            );
           } else {
             PL.songs.add(MusicData(
               songPath: entity,
-              title: "Unknown Title",
+              title: RegExp("([^/]+)/?\$").firstMatch(entity.path).toString(),
               artist: "Unknown Artist",
               album: "Unknown Album",
               artwork: null,
             ));
+            globals.allsongs.add(
+              MusicData(
+                songPath: entity,
+                title: RegExp("([^/]+)/?\$").firstMatch(entity.path).toString(),
+                artist: mp3instance.metaTags['Artist'],
+                album: mp3instance.metaTags['Album'],
+                // artwork: mp3instance.metaTags['APIC']['base64'],
+              ),
+            );
           }
+        }
+
+        previousFolderTitle = currentFolderTitle;
+      }
+    }
+    if (previousFolderTitle != null) {
+      PL.title = previousFolderTitle;
+    }
+    globals.allsongs.sort((a, b) => a.title.compareTo(b.title));
+
+    for (int i = 0; i < globals.allsongs.length; i++) {
+      for (int j = 1; j < globals.allsongs.length; j++) {
+        globals.MusicData a = globals.allsongs[i];
+        globals.MusicData b = globals.allsongs[j];
+        if (a.title == b.title) {
+          globals.allsongs.removeAt(j);
+        }
+      }
+    }
+
+    globals.testingBool.value = false;
+  }
+
+  checkPermissionManageStorage() async {
+    var storageStatus = await Permission.storage.status;
+
+    if (!storageStatus.isGranted) await Permission.storage.request();
+
+    if (await Permission.storage.isGranted) {
+      readMusicFilesDirectory();
+      // readMusicFilesDirectory();
+    } else {
+      // Ask for permission
+      // showToast("Provide Camera permission to use camera.", position: ToastPosition.bottom);
+    }
+  }
+
+  readMusicFilesDirectory2() async {
+    Playlist PL = Playlist(title: '', songs: []);
+    String? previousFolderTitle;
+
+    for (FileSystemEntity entity in _files) {
+      String path = entity.path;
+      if (path.endsWith('.mp3')) {
+        String currentFolderTitle = entity.path.split('/').elementAt(entity.path.split('/').length - 2);
+
+        // creates a new music folder
+        if (previousFolderTitle != currentFolderTitle && previousFolderTitle != null) {
+          PL.title = previousFolderTitle;
+
+          setState(() {
+            // ! probably setting the state is bad everytime we get new song
+            globals.playLists.add(PL);
+          });
+          PL = Playlist(title: '', songs: []);
+        } else // adds a new song to playlist
+        if (previousFolderTitle == currentFolderTitle && previousFolderTitle != null) {
+          MetadataRetriever.fromFile(
+            File(entity.path),
+          )
+            ..then(
+              (metadata) {
+                // log('${metadata.trackName} ${metadata.trackArtistNames} ${metadata.albumName}');
+                PL.songs.add(MusicData(
+                  songPath: entity,
+                  title: metadata.trackName ?? "-",
+                  artist: metadata.trackArtistNames.toString(),
+                  album: metadata.albumName,
+                  // artwork: metadata.albumArt,
+                ));
+
+                log('Added ${metadata.trackName}');
+              },
+            )
+            ..catchError((_) {
+              setState(() {
+                log('Couldn\'t extract metadata');
+              });
+            });
         }
 
         previousFolderTitle = currentFolderTitle;
@@ -155,28 +274,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  checkPermissionManageStorage() async {
-    var storageStatus = await Permission.storage.status;
-
-    if (!storageStatus.isGranted) await Permission.storage.request();
-
-    if (await Permission.storage.isGranted) {
-      readMusicFilesDirectory();
-    } else {
-      // Ask for permission
-      // showToast("Provide Camera permission to use camera.", position: ToastPosition.bottom);
-    }
-  }
-
   Future<void> _init() async {
-    checkPermissionManageStorage();
+    await checkPermissionManageStorage();
 
     // Inform the operating system of our app's audio attributes etc.
     // We pick a reasonable default for an app that plays speech.
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
 
-    log('App fully loaded, all data read from storage');
+    log('________App fully loaded, all data read from storage');
 
     // Listen to errors during playback.
     // _player.playbackEventStream.listen((event) {}, onError: (Object e, StackTrace stackTrace) {
@@ -223,11 +329,46 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           color: Color.fromRGBO(42, 41, 45, 1),
         ),
       ),
-      home: const MyHomePage(),
+      home: HomePage(
+        logoImage: image1,
+      ),
       routes: {
         musicRoute: (context) => const MusicView(),
         musicListViewRoute: (context) => const MusicListViewer(),
         queueRoute: (context) => const QueueView(),
+      },
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key, required this.logoImage}) : super(key: key);
+
+  final Image logoImage;
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: globals.testingBool,
+      builder: (_, isLoading, __) {
+        return isLoading == true
+            ? Scaffold(
+                body: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: logoImage,
+                        ),
+                        const Text('Loading music player'),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            : const MyHomePage();
       },
     );
   }

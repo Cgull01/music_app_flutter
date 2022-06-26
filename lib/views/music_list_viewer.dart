@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;
@@ -42,9 +44,9 @@ class _MusicListViewerState extends State<MusicListViewer> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: globals.playLists[globals.selectedPlaylistIndex].songs.length,
+              itemCount: globals.allsongs.length,
               itemBuilder: ((context, index) {
-                return MusicTile(mData: globals.playLists[globals.selectedPlaylistIndex].songs[index], index: index);
+                return MusicTile(mData: globals.allsongs[index], index: index);
               }),
             ),
           ),

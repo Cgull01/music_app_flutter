@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/globals.dart' as globals;
 
 class MainMenuButton extends StatelessWidget {
   const MainMenuButton({

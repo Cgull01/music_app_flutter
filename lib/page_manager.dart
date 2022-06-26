@@ -56,7 +56,7 @@ class PageManager {
         _playlist.length,
         AudioSource.uri(
           m.songPath.uri,
-          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title ?? "", artist: m.artist ?? ''),
+          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title, artist: m.artist ?? ''),
         ));
   }
 
@@ -77,7 +77,7 @@ class PageManager {
         index,
         AudioSource.uri(
           m.songPath.uri,
-          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title ?? "", artist: m.artist ?? ''),
+          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title, artist: m.artist ?? ''),
         ));
 
     await _audioPlayer.setAudioSource(_playlist);
@@ -94,7 +94,7 @@ class PageManager {
           .map(
             (item) => AudioSource.uri(
               item.songPath.uri,
-              tag: MusicData(songPath: item.songPath, album: item.album ?? "", title: item.title ?? "", artist: item.artist ?? ''),
+              tag: MusicData(songPath: item.songPath, album: item.album ?? "", title: item.title, artist: item.artist ?? ''),
             ),
           )
           .toList(),
