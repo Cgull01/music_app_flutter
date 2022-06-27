@@ -32,8 +32,7 @@ List<Playlist> playLists = [];
 
 int selectedPlaylistIndex = 0;
 
-final allPlaylistsNotifier = ValueNotifier<List<Playlist>>([]);
-final testingBool = ValueNotifier<bool>(true);
+final isLoading = ValueNotifier<bool>(true);
 
 class MusicData {
   final FileSystemEntity songPath;

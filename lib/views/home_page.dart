@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
-import 'package:music_app/constants/routes.dart';
 import 'package:music_app/globals.dart' as globals;
 
 import '../widgets/homePageWidgets/folder_button.dart';
@@ -32,9 +31,10 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: [
           MainMenuButton(
+            songsList: globals.allsongs,
             icon: Icons.music_note_rounded,
             text: 'All songs ${globals.allsongs.length}',
-            routeName: musicListViewRoute,
+            playListTitle: 'All songs',
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10),
@@ -65,9 +65,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     reverse: false,
                     itemCount: globals.playLists.length,
                     itemBuilder: (context, index) {
+                      globals.playLists[index].songs.sort((a, b) => a.title.compareTo(b.title));
+
                       return FolderButton(
-                        title: globals.playLists[index].title,
-                        songCount: globals.playLists[index].songs.length.toString(),
+                        playList: globals.playLists[index],
                       );
                     },
                   ),
@@ -75,16 +76,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          const MainMenuButton(
-            icon: Icons.favorite_rounded,
-            text: 'Favorites',
-            routeName: "",
-          ),
-          const MainMenuButton(
-            icon: Icons.timelapse_rounded,
-            text: 'Recently played',
-            routeName: "",
-          ),
+          // const MainMenuButton(
+          //   icon: Icons.favorite_rounded,
+          //   text: 'Favorites',
+          //   playListTitle: "",
+          // ),
+          // const MainMenuButton(
+          //   icon: Icons.timelapse_rounded,
+          //   text: 'Recently played',
+          //   playListTitle: "",
+          // ),
         ],
       ),
       bottomNavigationBar: const BottomMusicBar(),

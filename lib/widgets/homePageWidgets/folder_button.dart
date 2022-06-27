@@ -1,21 +1,22 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:music_app/globals.dart' as globals;
+import 'package:music_app/views/music_list_viewer.dart';
 
 class FolderButton extends StatelessWidget {
   const FolderButton({
-    required this.title,
-    required this.songCount,
+    required this.playList,
     Key? key,
   }) : super(key: key);
 
-  final String title;
-  final String songCount;
+  final globals.Playlist playList;
 
   @override
   Widget build(BuildContext context) {
+    globals.Playlist _playList = playList;
+
     return Container(
-      alignment: Alignment.centerLeft,
-      width: MediaQuery.of(context).size.width / 2,
-      margin: const EdgeInsets.only(top: 6),
       decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(
@@ -26,31 +27,38 @@ class FolderButton extends StatelessWidget {
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          primary: Color.fromARGB(255, 34, 33, 33),
+          primary: const Color.fromARGB(255, 34, 33, 33),
           minimumSize: const Size(114, 70),
         ),
-        onPressed: () {},
-        child: Container(
-          padding: const EdgeInsets.only(top: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                overflow: TextOverflow.ellipsis,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MusicListViewer(
+                songList: playList.songs,
+                playListTitle: playList.title,
               ),
-              Text(
-                '$songCount songs',
-                style: const TextStyle(
-                  fontSize: 15,
-                ),
+            ),
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _playList.title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-            ],
-          ),
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              '${_playList.songs.length} songs',
+              style: const TextStyle(
+                fontSize: 15,
+              ),
+            ),
+          ],
         ),
       ),
     );

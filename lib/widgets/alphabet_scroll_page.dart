@@ -18,7 +18,7 @@ class _AZItem extends ISuspensionBean {
 }
 
 class AlphabetScrollPage extends StatefulWidget {
-  final List<String> items;
+  final List<globals.MusicData> items;
 
   const AlphabetScrollPage({
     Key? key,
@@ -35,7 +35,8 @@ class _AlphabetScrollPageState extends State<AlphabetScrollPage> {
   void initState() {
     super.initState();
 
-    initList(widget.items);
+    List<String> titles = widget.items.map((e) => e.title).toList();
+    initList(titles);
   }
 
   void initList(List<String> items) {
@@ -52,7 +53,7 @@ class _AlphabetScrollPageState extends State<AlphabetScrollPage> {
         data: items,
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return MusicTile(mData: globals.allsongs[index], index: index);
+          return MusicTile(mData: widget.items[index], index: index);
         });
   }
 }

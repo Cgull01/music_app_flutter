@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:music_app/globals.dart' as globals;
+import 'package:music_app/views/music_list_viewer.dart';
 
 class MainMenuButton extends StatelessWidget {
   const MainMenuButton({
     Key? key,
     required this.icon,
     required this.text,
-    required this.routeName,
+    required this.songsList,
+    required this.playListTitle,
   }) : super(key: key);
 
   final IconData icon;
   final String text;
-  final String routeName;
+  final List<globals.MusicData> songsList;
+  final String playListTitle;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
         left: 16,
-        right: 30,
+        right: 16,
         top: 33,
       ),
       child: Container(
@@ -41,7 +44,15 @@ class MainMenuButton extends StatelessWidget {
             ),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, routeName);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MusicListViewer(
+                  songList: songsList,
+                  playListTitle: playListTitle,
+                ),
+              ),
+            );
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

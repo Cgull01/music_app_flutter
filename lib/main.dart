@@ -58,17 +58,19 @@ FIRST:
   V display buttons after loading, maybe add loading screen
   V Show icon instead of circular progress indicator
   - focus on creating fast loading time, asynchronous code
-  O add alphabet on music list view import 'package:alphabet_list_scroll_view/alphabet_list_scroll_view.dart';
-  - be able to open different folders
+  V add alphabet on music list view import 'package:alphabet_list_scroll_view/alphabet_list_scroll_view.dart';
+  V be able to open different folders, FIX reading first folder somethings wrong with song count
   - add music deletion
   - search bar
   - external storage
+  - notification bar
 SECOND:
   - images
   - fully functional queue
   - localstorage
   - favorites, most played
   - song sorting
+  - settings, themes
 
 */
 
@@ -124,13 +126,39 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     for (FileSystemEntity entity in _files) {
       String path = entity.path;
+
       if (path.endsWith('.mp3')) {
         List<int> mp3Bytes = File(entity.path).readAsBytesSync();
         MP3Instance mp3instance = MP3Instance(mp3Bytes);
 
         String currentFolderTitle = entity.path.split('/').elementAt(entity.path.split('/').length - 2);
 
-        final regex = RegExp("([^/]+)/?\$");
+        final titleRegex = RegExp("([^/]+)/?\$");
+        MusicData newSong;
+        log("-------");
+        log(entity.path);
+
+        if (mp3instance.parseTagsSync()) {
+          newSong = MusicData(
+            songPath: entity,
+            title: mp3instance.metaTags['Title'].toString() == "null"
+                ? titleRegex.firstMatch(entity.path)!.group(0).toString()
+                : mp3instance.metaTags['Title'].toString(),
+            artist: mp3instance.metaTags['Artist'] == "null" ? "Unknown artist" : mp3instance.metaTags['Artist'],
+            album: mp3instance.metaTags['Album'] == "null" ? "Unknown album" : mp3instance.metaTags['Album'],
+            // artwork: mp3instance.metaTags['APIC']['base64'],
+          );
+        } else {
+          newSong = MusicData(
+            songPath: entity,
+            title: mp3instance.metaTags['Title'].toString() == "null"
+                ? titleRegex.firstMatch(entity.path)!.group(0).toString()
+                : mp3instance.metaTags['Title'].toString(),
+            artist: mp3instance.metaTags['Artist'] == "null" ? "Unknown artist" : mp3instance.metaTags['Artist'],
+            album: mp3instance.metaTags['Album'] == "null" ? "Unknown album" : mp3instance.metaTags['Album'],
+            // artwork: mp3instance.metaTags['APIC']['base64'],
+          );
+        }
 
         // creates a new music folder
         if (previousFolderTitle != currentFolderTitle && previousFolderTitle != null) {
@@ -138,74 +166,36 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
           setState(() {
             globals.playLists.add(PL);
-            globals.allPlaylistsNotifier.value = globals.playLists;
             log('Value notifier updated');
           });
           PL = Playlist(title: '', songs: []);
+          PL.songs.add(newSong);
         } else // adds a new song to playlist
-        if (previousFolderTitle == currentFolderTitle && previousFolderTitle != null) {
-          if (mp3instance.parseTagsSync()) {
-            // log('${mp3instance.metaTags['APIC']['base64'].toString()}');
-            globals.allsongs.add(
-              MusicData(
-                songPath: entity,
-                title: mp3instance.metaTags['Title'].toString() == "null"
-                    ? regex.firstMatch(entity.path)!.group(0).toString()
-                    : mp3instance.metaTags['Title'].toString(),
-                artist: mp3instance.metaTags['Artist'] == "null" ? "Unknown artist" : mp3instance.metaTags['Artist'],
-                album: mp3instance.metaTags['Album'] == "null" ? "Unknown album" : mp3instance.metaTags['Album'],
-                // artwork: mp3instance.metaTags['APIC']['base64'],
-              ),
-            );
-            // log("added ${globals.allsongs[globals.allsongs.length - 1].title} ${entity.path}");
-            PL.songs.add(
-              MusicData(
-                songPath: entity,
-                title: mp3instance.metaTags['Title'].toString(),
-                artist: mp3instance.metaTags['Artist'],
-                album: mp3instance.metaTags['Album'],
-                // artwork: mp3instance.metaTags['APIC']['base64'],
-              ),
-            );
-          } else {
-            PL.songs.add(MusicData(
-              songPath: entity,
-              title: RegExp("([^/]+)/?\$").firstMatch(entity.path).toString(),
-              artist: "Unknown Artist",
-              album: "Unknown Album",
-              artwork: null,
-            ));
-            globals.allsongs.add(
-              MusicData(
-                songPath: entity,
-                title: RegExp("([^/]+)/?\$").firstMatch(entity.path).toString(),
-                artist: mp3instance.metaTags['Artist'],
-                album: mp3instance.metaTags['Album'],
-                // artwork: mp3instance.metaTags['APIC']['base64'],
-              ),
-            );
-          }
+        {
+          log('${currentFolderTitle}');
+          globals.allsongs.add(newSong);
+          PL.songs.add(newSong);
+
+          // log("${previousFolderTitle} added ${newSong.title}");
         }
 
         previousFolderTitle = currentFolderTitle;
       }
     }
+
     if (previousFolderTitle != null) {
       PL.title = previousFolderTitle;
     }
+
     globals.allsongs.sort((a, b) => a.title.compareTo(b.title));
 
-    for (int i = 0; i < globals.allsongs.length; i++) {
-      for (int j = 1; j < globals.allsongs.length; j++) {
-        globals.MusicData a = globals.allsongs[i];
-        globals.MusicData b = globals.allsongs[j];
-        if (a.title == b.title) {
-          globals.allsongs.removeAt(j);
-        }
+    for (int i = 0; i < globals.allsongs.length - 1; i++) {
+      if (globals.allsongs[i].title == globals.allsongs[i + 1].title && globals.allsongs[i].artist == globals.allsongs[i + 1].artist) {
+        globals.allsongs.removeAt(i + 1);
       }
     }
 
-    globals.testingBool.value = false;
+    globals.isLoading.value = false;
   }
 
   checkPermissionManageStorage() async {
@@ -215,62 +205,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     if (await Permission.storage.isGranted) {
       readMusicFilesDirectory();
-      // readMusicFilesDirectory();
     } else {
       // Ask for permission
       // showToast("Provide Camera permission to use camera.", position: ToastPosition.bottom);
-    }
-  }
-
-  readMusicFilesDirectory2() async {
-    Playlist PL = Playlist(title: '', songs: []);
-    String? previousFolderTitle;
-
-    for (FileSystemEntity entity in _files) {
-      String path = entity.path;
-      if (path.endsWith('.mp3')) {
-        String currentFolderTitle = entity.path.split('/').elementAt(entity.path.split('/').length - 2);
-
-        // creates a new music folder
-        if (previousFolderTitle != currentFolderTitle && previousFolderTitle != null) {
-          PL.title = previousFolderTitle;
-
-          setState(() {
-            // ! probably setting the state is bad everytime we get new song
-            globals.playLists.add(PL);
-          });
-          PL = Playlist(title: '', songs: []);
-        } else // adds a new song to playlist
-        if (previousFolderTitle == currentFolderTitle && previousFolderTitle != null) {
-          MetadataRetriever.fromFile(
-            File(entity.path),
-          )
-            ..then(
-              (metadata) {
-                // log('${metadata.trackName} ${metadata.trackArtistNames} ${metadata.albumName}');
-                PL.songs.add(MusicData(
-                  songPath: entity,
-                  title: metadata.trackName ?? "-",
-                  artist: metadata.trackArtistNames.toString(),
-                  album: metadata.albumName,
-                  // artwork: metadata.albumArt,
-                ));
-
-                log('Added ${metadata.trackName}');
-              },
-            )
-            ..catchError((_) {
-              setState(() {
-                log('Couldn\'t extract metadata');
-              });
-            });
-        }
-
-        previousFolderTitle = currentFolderTitle;
-      }
-    }
-    if (previousFolderTitle != null) {
-      PL.title = previousFolderTitle;
     }
   }
 
@@ -334,7 +271,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ),
       routes: {
         musicRoute: (context) => const MusicView(),
-        musicListViewRoute: (context) => const MusicListViewer(),
+        musicListViewRoute: (context) => MusicListViewer(
+              songList: allsongs,
+              playListTitle: 'All songs',
+            ),
         queueRoute: (context) => const QueueView(),
       },
     );
@@ -348,7 +288,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: globals.testingBool,
+      valueListenable: globals.isLoading,
       builder: (_, isLoading, __) {
         return isLoading == true
             ? Scaffold(

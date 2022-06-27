@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:music_app/widgets/alphabet_scroll_page.dart';
@@ -6,7 +6,10 @@ import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;
 
 class MusicListViewer extends StatefulWidget {
-  const MusicListViewer({Key? key}) : super(key: key);
+  const MusicListViewer({Key? key, required this.songList, required this.playListTitle}) : super(key: key);
+
+  final List<globals.MusicData> songList;
+  final String playListTitle;
 
   @override
   State<MusicListViewer> createState() => _MusicListViewerState();
@@ -18,9 +21,11 @@ class _MusicListViewerState extends State<MusicListViewer> {
     super.initState();
   }
 
-  List items = ['yes', 'no', 'maybe'];
   @override
   Widget build(BuildContext context) {
+    List<globals.MusicData> _songList = widget.songList;
+    String _playListTitle = widget.playListTitle;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -39,7 +44,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
             Navigator.pop(context);
           },
         ),
-        title: const Text("All Songs"),
+        title: Text(_playListTitle),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -53,7 +58,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
           //   ),
           // ),
           Expanded(
-            child: AlphabetScrollPage(items: globals.allsongs.map((e) => e.title).toList()),
+            child: AlphabetScrollPage(items: _songList),
           )
         ],
       ),
