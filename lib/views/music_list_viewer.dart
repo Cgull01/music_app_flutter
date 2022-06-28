@@ -28,7 +28,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: globals.colors['primary'],
         elevation: 0.0,
         flexibleSpace: GestureDetector(
           onPanUpdate: (details) {
@@ -83,10 +83,23 @@ class MusicTile extends StatelessWidget {
         Dismissible(
           direction: DismissDirection.endToStart,
           background: Container(
-            color: Colors.green,
+            color: globals.colors['secondary'],
+            padding: const EdgeInsets.only(right: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                Icon(Icons.keyboard_double_arrow_left_sharp),
+                Text(
+                  '          +',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Icon(Icons.queue_music_sharp),
+              ],
+            ),
           ),
           confirmDismiss: (direction) async {
             globals.pageManager.addToQueue(mData);
+            globals.showSnackBar(context, 'Added to queue');
             return false;
           },
           key: const ValueKey<int>(0),
@@ -104,12 +117,12 @@ class MusicTile extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(
+        Divider(
           height: 5,
           thickness: 0.75,
           indent: 10,
           endIndent: 30,
-          color: Colors.grey,
+          color: globals.colors['accent'],
         ),
       ],
     );

@@ -13,7 +13,7 @@ class MusicView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: globals.colors['musicViewTop'],
         elevation: 0.0,
         flexibleSpace: GestureDetector(
           onPanUpdate: (details) {
@@ -56,7 +56,7 @@ class MusicView extends StatelessWidget {
                         'assets/images/CenterCircle.svg',
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height,
-                        color: const Color.fromARGB(30, 236, 132, 21),
+                        color: globals.colors['adaptiveAccents'],
                       ),
                     ),
                     const SongPictureAccent(fileName: 'assets/images/OffsetCircle1.svg'),
@@ -116,9 +116,9 @@ class MusicView extends StatelessWidget {
               Flexible(
                 flex: 4,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color.fromRGBO(42, 41, 45, 1),
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: globals.colors['secondary'],
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
@@ -176,10 +176,10 @@ class MusicView extends StatelessWidget {
                             Expanded(
                               child: Divider(
                                 height: 5,
-                                thickness: 0.75,
+                                thickness: 0.45,
                                 indent: 20,
                                 endIndent: 20,
-                                color: Colors.grey.shade800,
+                                color: globals.colors['accent'],
                               ),
                             )
                           ],
@@ -243,7 +243,7 @@ class _SongPictureAccentState extends State<SongPictureAccent> with TickerProvid
           widget.fileName,
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          color: const Color.fromARGB(45, 144, 121, 95),
+          color: globals.colors['animation'],
         ),
       ),
     );

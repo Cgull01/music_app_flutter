@@ -82,10 +82,10 @@ class MyApp extends StatefulWidget {
 }
 
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.black87, // navigation bar color
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: globals.colors['primary'], // navigation bar color
     systemNavigationBarIconBrightness: Brightness.light, //navigation bar icon
-    systemNavigationBarDividerColor: Colors.greenAccent, //Navigation bar divider color
+    systemNavigationBarDividerColor: globals.colors['primary'], //Navigation bar divider color
 
     statusBarColor: Colors.transparent, // status bar color
     statusBarIconBrightness: Brightness.light, //status barIcon Brightness
@@ -104,9 +104,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       width: 150,
     );
     WidgetsBinding.instance.addObserver(this);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-    ));
 
     _init();
   }
@@ -135,8 +132,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
         final titleRegex = RegExp("([^/]+)/?\$");
         MusicData newSong;
-        log("-------");
-        log(entity.path);
 
         if (mp3instance.parseTagsSync()) {
           newSong = MusicData(
@@ -172,11 +167,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           PL.songs.add(newSong);
         } else // adds a new song to playlist
         {
-          log('${currentFolderTitle}');
           globals.allsongs.add(newSong);
           PL.songs.add(newSong);
-
-          // log("${previousFolderTitle} added ${newSong.title}");
         }
 
         previousFolderTitle = currentFolderTitle;
@@ -252,18 +244,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       title: 'Music player',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromRGBO(16, 16, 16, 1),
         brightness: Brightness.dark,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromRGBO(16, 16, 16, 1),
+        scaffoldBackgroundColor: globals.colors['primary'],
+        appBarTheme: AppBarTheme(
+          backgroundColor: globals.colors['primary'],
         ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            primary: const Color.fromRGBO(60, 60, 60, 1),
-          ),
-        ),
-        bottomAppBarTheme: const BottomAppBarTheme(
-          color: Color.fromRGBO(42, 41, 45, 1),
+        bottomAppBarTheme: BottomAppBarTheme(
+          color: globals.colors['secondary'],
         ),
       ),
       home: HomePage(

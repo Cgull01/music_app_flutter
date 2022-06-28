@@ -24,26 +24,63 @@ class MainMenuButton extends StatelessWidget {
         right: 16,
         top: 33,
       ),
-      child: Container(
+      // child: Container(
+      //   decoration: BoxDecoration(
+      //     border: Border(
+      //       left: BorderSide(
+      //         width: 6.0,
+      //         color: globals.colors['accent'] ?? Colors.grey,
+      //       ),
+      //     ),
+      //   ),
+      //   child: ElevatedButton(
+      //     style: ElevatedButton.styleFrom(
+      //       primary: globals.colors['secondary'],
+      //       minimumSize: const Size(311, 63),
+      //       shape: RoundedRectangleBorder(
+      //         borderRadius: BorderRadius.circular(5),
+      //       ),
+      //       textStyle: const TextStyle(
+      //         fontSize: 27,
+      //         fontWeight: FontWeight.bold,
+      //         // fontFamily: 'Gothic A1',
+      //       ),
+      //     ),
+      //     onPressed: () {
+      //       Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => MusicListViewer(
+      //             songList: songsList,
+      //             playListTitle: playListTitle,
+      //           ),
+      //         ),
+      //       );
+      //     },
+      //     child: Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Row(
+      //           children: [
+      //             Icon(icon, size: 27),
+      //             Text(' $text'),
+      //           ],
+      //         ),
+      //         const Icon(Icons.keyboard_arrow_right, size: 30),
+      //       ],
+      //     ),
+      //   ),
+      // ),
+      child: Ink(
+        height: 60,
         decoration: const BoxDecoration(
-          border: Border(
-            left: BorderSide(width: 4.0, color: Colors.white),
+          gradient: LinearGradient(stops: [0.02, 0.02], colors: [Colors.white, Color.fromRGBO(42, 41, 45, 1)]),
+          borderRadius: BorderRadius.all(
+            Radius.circular(6.0),
           ),
         ),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: const Color.fromARGB(255, 34, 33, 33),
-            minimumSize: const Size(311, 63),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5), // <-- Radius
-            ),
-            textStyle: const TextStyle(
-              fontSize: 27,
-              fontWeight: FontWeight.bold,
-              // fontFamily: 'Gothic A1',
-            ),
-          ),
-          onPressed: () {
+        child: InkWell(
+          onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -57,11 +94,20 @@ class MainMenuButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(icon, size: 27),
-                  Text(' $text'),
-                ],
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Row(
+                  children: [
+                    Icon(icon, size: 27),
+                    Text(
+                      ' $text',
+                      style: const TextStyle(
+                        fontSize: 27,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const Icon(Icons.keyboard_arrow_right, size: 30),
             ],

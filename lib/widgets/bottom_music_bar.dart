@@ -36,20 +36,13 @@ class BottomMusicBar extends StatelessWidget {
                     valueListenable: globals.pageManager.progressNotifier,
                     builder: (_, value, __) {
                       return LinearProgressIndicator(
-                        color: const Color.fromARGB(255, 95, 148, 163),
-                        backgroundColor: const Color.fromRGBO(42, 41, 45, 1),
+                        color: globals.colors['visual'],
+                        backgroundColor: globals.colors['secondary'],
                         minHeight: 4,
-                        value: getMusicProgress(value), //((value.total.inSeconds - value.current.inSeconds) / value.total.inSeconds),
+                        value: getMusicProgress(value), //((value.
                       );
                     },
                   ),
-                  // const LinearProgressIndicator(
-                  //   color: Color.fromARGB(255, 95, 148, 163),
-                  //   backgroundColor: Color.fromRGBO(16, 16, 16, 1),
-                  //   // value: 0,
-                  //   minHeight: 4,
-                  //   value: 0.7,
-                  // ),
                   Row(
                     children: [
                       Column(
@@ -81,7 +74,6 @@ class BottomMusicBar extends StatelessWidget {
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      // fontFamily: 'Gothic A1',
                                     ),
                                   ),
                                 ),
@@ -140,7 +132,7 @@ class QueueButton extends StatelessWidget {
               return IconButton(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
-                color: Colors.red,
+                color: globals.colors['toggle'],
                 onPressed: () {
                   globals.pageManager.queueButtonNotifier.value = QueueState.inactive;
                   Navigator.pop(context);

@@ -46,9 +46,10 @@ class _AlphabetScrollPageState extends State<AlphabetScrollPage> {
   @override
   Widget build(BuildContext context) {
     return AzListView(
-        indexBarOptions: const IndexBarOptions(
+        padding: const EdgeInsets.only(right: 5, left: 5),
+        indexBarOptions: IndexBarOptions(
           needRebuild: true,
-          selectItemDecoration: BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
+          selectItemDecoration: BoxDecoration(shape: BoxShape.circle, color: globals.colors['visual']),
         ),
         data: items,
         itemCount: items.length,

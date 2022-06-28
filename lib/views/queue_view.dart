@@ -15,9 +15,9 @@ class QueueView extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(42, 41, 45, 1),
+        backgroundColor: globals.colors['secondary'],
         appBar: AppBar(
-          backgroundColor: const Color.fromRGBO(42, 41, 45, 1),
+          backgroundColor: globals.colors['secondary'],
           elevation: 0.0,
           flexibleSpace: GestureDetector(
             onPanUpdate: (details) {
@@ -68,7 +68,7 @@ class PlaylistWidget extends StatelessWidget {
                   thickness: 0,
                   indent: 10,
                   endIndent: 30,
-                  color: Colors.grey,
+                  color: globals.colors['accent'],
                 );
               } else if (index == 0) {
                 return ListTile(
@@ -106,9 +106,18 @@ class QueueTile extends StatelessWidget {
         Dismissible(
           direction: DismissDirection.endToStart,
           background: Container(
-            color: Colors.green,
+            color: globals.colors['primary'],
+            padding: const EdgeInsets.only(right: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                Icon(Icons.keyboard_double_arrow_left_sharp),
+                Icon(Icons.delete_outline_outlined),
+              ],
+            ),
           ),
           confirmDismiss: (direction) async {
+            globals.showSnackBar(context, 'Removed from queue');
             globals.pageManager.removeFromQueue(index);
             return false;
           },
@@ -124,12 +133,12 @@ class QueueTile extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(
+        Divider(
           height: 5,
           thickness: 0.75,
           indent: 10,
           endIndent: 30,
-          color: Colors.grey,
+          color: globals.colors['accent'],
         ),
       ],
     );

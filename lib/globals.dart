@@ -58,3 +58,37 @@ class Playlist {
     required this.songs,
   });
 }
+
+void showSnackBar(context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      backgroundColor: const Color.fromRGBO(42, 41, 45, 1),
+      content: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white),
+      ),
+      duration: const Duration(milliseconds: 500),
+      width: 180.0, // Width of the SnackBar.
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8.0, // Inner padding for SnackBar content.
+        vertical: 8,
+      ),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+    ),
+  );
+}
+
+const colors = {
+  'primary': Color.fromRGBO(16, 16, 16, 1),
+  'secondary': Color.fromRGBO(42, 41, 45, 1),
+  'accent': Color.fromRGBO(158, 158, 158, 1),
+  'musicViewTop': Colors.transparent,
+  'adaptiveAccents': Color.fromARGB(30, 236, 132, 21),
+  'animation': Color.fromARGB(45, 144, 121, 95),
+  'visual': Color.fromARGB(255, 95, 148, 163),
+  'toggle': Colors.red,
+};

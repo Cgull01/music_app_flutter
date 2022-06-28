@@ -43,7 +43,7 @@ class _SeekBarState extends State<SeekBar> {
         SliderTheme(
           data: _sliderThemeData.copyWith(
             thumbShape: HiddenThumbComponentShape(),
-            activeTrackColor: Colors.grey,
+            activeTrackColor: globals.colors['accent'],
           ),
           child: ExcludeSemantics(
             child: Slider(
@@ -69,7 +69,7 @@ class _SeekBarState extends State<SeekBar> {
         ),
         SliderTheme(
           data: _sliderThemeData.copyWith(
-            inactiveTrackColor: Colors.grey,
+            inactiveTrackColor: globals.colors['accent'],
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
           ),
           child: Slider(
@@ -275,7 +275,12 @@ class ShuffleButton extends StatelessWidget {
       valueListenable: globals.pageManager.isShuffleModeEnabledNotifier,
       builder: (context, isEnabled, child) {
         return IconButton(
-          icon: (isEnabled) ? const Icon(Icons.shuffle_rounded) : const Icon(Icons.shuffle_rounded, color: Colors.grey),
+          icon: (isEnabled)
+              ? const Icon(Icons.shuffle_rounded)
+              : Icon(
+                  Icons.shuffle_rounded,
+                  color: globals.colors['accent'],
+                ),
           onPressed: globals.pageManager.onShuffleButtonPressed,
         );
       },
@@ -316,7 +321,7 @@ class RepeatButton extends StatelessWidget {
           case RepeatState.off:
             icon = Icon(
               Icons.repeat,
-              color: Colors.grey,
+              color: globals.colors['accent'],
               size: iconSize,
             );
             break;

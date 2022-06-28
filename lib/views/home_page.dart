@@ -33,11 +33,11 @@ class _MyHomePageState extends State<MyHomePage> {
           MainMenuButton(
             songsList: globals.allsongs,
             icon: Icons.music_note_rounded,
-            text: 'All songs ${globals.allsongs.length}',
+            text: 'All songs',
             playListTitle: 'All songs',
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: 16, right: 16),
             child: Column(
               children: [
                 Padding(
@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height / 4,
+                  height: MediaQuery.of(context).size.height / 2.8,
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     reverse: false,
@@ -76,16 +76,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          // const MainMenuButton(
-          //   icon: Icons.favorite_rounded,
-          //   text: 'Favorites',
-          //   playListTitle: "",
-          // ),
-          // const MainMenuButton(
-          //   icon: Icons.timelapse_rounded,
-          //   text: 'Recently played',
-          //   playListTitle: "",
-          // ),
+          const MainMenuButton(
+            songsList: [],
+            icon: Icons.favorite_rounded,
+            text: 'Favorites',
+            playListTitle: "",
+          ),
         ],
       ),
       bottomNavigationBar: const BottomMusicBar(),

@@ -17,17 +17,20 @@ class FolderButton extends StatelessWidget {
     globals.Playlist _playList = playList;
 
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            width: 1.5,
-            color: Color.fromARGB(255, 130, 130, 130),
-          ),
-        ),
+      padding: EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: new BorderRadius.all(const Radius.circular(6.0)),
+
+        // border: Border(
+        //   top: BorderSide(
+        //     width: 1.5,
+        //     color: globals.colors['accent'] ?? Colors.grey,
+        //   ),
+        // ),
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          primary: const Color.fromARGB(255, 34, 33, 33),
+          primary: globals.colors['secondary'],
           minimumSize: const Size(114, 70),
         ),
         onPressed: () {
