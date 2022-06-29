@@ -30,9 +30,11 @@ List<MusicData> allsongs = [];
 
 List<Playlist> playLists = [];
 
-int selectedPlaylistIndex = 0;
+late Playlist activePlaylist;
 
 final isLoading = ValueNotifier<bool>(true);
+
+late int removedSongIndex;
 
 class MusicData {
   final FileSystemEntity songPath;

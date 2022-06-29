@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;

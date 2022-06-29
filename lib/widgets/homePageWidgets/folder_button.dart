@@ -34,6 +34,7 @@ class FolderButton extends StatelessWidget {
           minimumSize: const Size(114, 70),
         ),
         onPressed: () {
+          globals.activePlaylist = playList;
           Navigator.push(
             context,
             MaterialPageRoute(

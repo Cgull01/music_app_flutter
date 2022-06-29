@@ -60,10 +60,11 @@ FIRST:
   - focus on creating fast loading time, asynchronous code
   V add alphabet on music list view import 'package:alphabet_list_scroll_view/alphabet_list_scroll_view.dart';
   V be able to open different folders, FIX reading first folder somethings wrong with song count
-  - add music deletion
+  O add music deletion
   - search bar
   - external storage
   - notification bar
+  maybe test moving metadata to another async function, read first add metadata later, check speed if commented metadata
 SECOND:
   - images
   - fully functional queue
