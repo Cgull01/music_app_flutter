@@ -109,45 +109,43 @@ class MusicTile extends StatelessWidget {
             return false;
           },
           key: const ValueKey<int>(0),
-          child: InkWell(
-            onTap: (() async {
+          child: ListTile(
+            onTap: () async {
               globals.pageManager.playSelectedSong(mData);
-            }),
-            child: ListTile(
-              title: Text(mData.title.toString(), overflow: TextOverflow.ellipsis),
-              trailing: PopupMenuButton(
-                icon: const Icon(Icons.more_vert_rounded),
-                itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                  PopupMenuItem(
-                    child: Row(
-                      children: const [Icon(Icons.delete_outline), Text(' Delete song')],
-                    ),
-                    onTap: () {
-                      File songToDelete = File(mData.songPath.path);
-                      globals.activePlaylist.songs.removeAt(index);
-                      songToDelete.delete().catchError(
-                        (err) {
-                          globals.showSnackBar(context, 'Error occured [$err]');
-                        },
-                      ).then((value) => globals.showSnackBar(context, 'Song deleted $index'));
-                      globals.removedSongIndex = index;
-                      notifyParent();
-                    },
+            },
+            title: Text(mData.title.toString(), overflow: TextOverflow.ellipsis),
+            trailing: PopupMenuButton(
+              icon: const Icon(Icons.more_vert_rounded),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                PopupMenuItem(
+                  child: Row(
+                    children: const [Icon(Icons.delete_outline), Text(' Delete song')],
                   ),
-                  PopupMenuItem(
-                    child: Row(
-                      children: const [Icon(Icons.queue_music_rounded), Text(' Add to queue')],
-                    ),
+                  onTap: () {
+                    File songToDelete = File(mData.songPath.path);
+                    globals.activePlaylist.songs.removeAt(index);
+                    songToDelete.delete().catchError(
+                      (err) {
+                        globals.showSnackBar(context, 'Error occured [$err]');
+                      },
+                    ).then((value) => globals.showSnackBar(context, 'Song deleted $index'));
+                    globals.removedSongIndex = index;
+                    notifyParent();
+                  },
+                ),
+                PopupMenuItem(
+                  child: Row(
+                    children: const [Icon(Icons.queue_music_rounded), Text(' Add to queue')],
                   ),
-                  PopupMenuItem(
-                    child: Row(
-                      children: const [Icon(Icons.favorite_rounded), Text(' Add to favorites')],
-                    ),
+                ),
+                PopupMenuItem(
+                  child: Row(
+                    children: const [Icon(Icons.favorite_rounded), Text(' Add to favorites')],
                   ),
-                ],
-              ),
-              subtitle: Text('${mData.artist.toString()} - ${mData.album.toString()}', overflow: TextOverflow.ellipsis),
+                ),
+              ],
             ),
+            subtitle: Text('${mData.artist.toString()} - ${mData.album.toString()}', overflow: TextOverflow.ellipsis),
           ),
         ),
         Divider(

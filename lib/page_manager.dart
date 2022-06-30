@@ -186,6 +186,7 @@ class PageManager {
       }
 
       //final titles = playlist.map((item) => item.tag as musicData).toList();
+      // songs added in queue, i think
       playlistNotifier.value = titles;
 
       // update shuffle mode

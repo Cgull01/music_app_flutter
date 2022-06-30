@@ -1,6 +1,9 @@
+import 'dart:core';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/src/foundation/diagnostics.dart';
+import 'package:music_app/widgets/alphabet_scroll_page.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;
 
@@ -19,24 +22,42 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          decoration: InputDecoration(
-            labelText: "Search for songs",
-            prefixIcon: const Icon(Icons.search_rounded),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {},
-            ),
+        backgroundColor: globals.colors['secondary'],
+        title: InkWell(
+          onTap: () {
+            showSearch(context: context, delegate: MySearchDelegate());
+          },
+          child: const Text(
+            'Search for songs',
+            style: TextStyle(fontWeight: FontWeight.normal),
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showSearch(context: context, delegate: MySearchDelegate());
+            },
+            icon: const Icon(Icons.search_rounded),
+            iconSize: 30,
+          ),
+        ],
       ),
       body: Column(
         children: [
-          MainMenuButton(
-            songsList: globals.allsongs,
-            icon: Icons.music_note_rounded,
-            text: 'All songs',
-            playListTitle: 'All songs',
+          Padding(
+            padding: const EdgeInsets.only(top: 18),
+            child: MainMenuButton(
+              songsList: globals.allsongs,
+              icon: Icons.music_note_rounded,
+              text: 'All songs',
+              playListTitle: 'All songs',
+            ),
+          ),
+          const MainMenuButton(
+            songsList: [],
+            icon: Icons.favorite_rounded,
+            text: 'Favorites',
+            playListTitle: "",
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
@@ -78,15 +99,66 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          const MainMenuButton(
-            songsList: [],
-            icon: Icons.favorite_rounded,
-            text: 'Favorites',
-            playListTitle: "",
-          ),
         ],
       ),
       bottomNavigationBar: const BottomMusicBar(),
+    );
+  }
+}
+
+class MySearchDelegate extends SearchDelegate {
+  // List<String> searchResults = ['asdf', 'aaaaa', 'lorema'];
+
+  List<globals.MusicData> searchResults2 = globals.allsongs;
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+          onPressed: () {
+            if (query.isEmpty) {
+              close(context, null);
+            } else {
+              query = '';
+            }
+          },
+          icon: const Icon(Icons.clear),
+        )
+      ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+        onPressed: () => close(context, null),
+        icon: const Icon(Icons.arrow_back),
+      );
+
+  @override
+  Widget buildResults(BuildContext context) => Center(
+        child: Text(
+          query,
+          style: const TextStyle(
+            fontSize: 30,
+          ),
+        ),
+      );
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<globals.MusicData> suggestions2 = searchResults2.where((searchResult) {
+      final title = searchResult.title.toLowerCase();
+      final artist = searchResult.artist?.toLowerCase() ?? "";
+      final album = searchResult.album?.toLowerCase() ?? "";
+
+      final input = query.toLowerCase();
+
+      return title.contains(input) || artist.contains(input) || album.contains(input);
+    }).toList();
+
+    return ListView.builder(
+      itemCount: suggestions2.length,
+      itemBuilder: (context, index) {
+        final suggestion = suggestions2[index];
+        return MusicTile(mData: suggestion, index: index, notifyParent: () {});
+      },
     );
   }
 }

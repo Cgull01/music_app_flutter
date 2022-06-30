@@ -29,7 +29,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: globals.colors['primary'],
+        backgroundColor: globals.colors['secondary'],
         elevation: 0.0,
         flexibleSpace: GestureDetector(
           onPanUpdate: (details) {
@@ -50,14 +50,27 @@ class _MusicListViewerState extends State<MusicListViewer> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Expanded(
-          //   child: ListView.builder(
-          //     itemCount: globals.allsongs.length,
-          //     itemBuilder: ((context, index) {
-          //       return MusicTile(mData: globals.allsongs[index], index: index);
-          //     }),
-          //   ),
-          // ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: InkWell(
+              onTap: () {
+                globals.pageManager.setPlaylist(_songList);
+              },
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.play_circle_fill_rounded),
+                    iconSize: 40,
+                  ),
+                  Text(
+                    "Play all (${_songList.length})",
+                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: AlphabetScrollPage(items: _songList),
           )

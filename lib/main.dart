@@ -60,8 +60,8 @@ FIRST:
   - focus on creating fast loading time, asynchronous code
   V add alphabet on music list view import 'package:alphabet_list_scroll_view/alphabet_list_scroll_view.dart';
   V be able to open different folders, FIX reading first folder somethings wrong with song count
-  O add music deletion
-  - search bar
+  V add music deletion
+  O search bar
   - external storage
   - notification bar
   maybe test moving metadata to another async function, read first add metadata later, check speed if commented metadata
@@ -72,7 +72,7 @@ SECOND:
   - favorites, most played
   - song sorting
   - settings, themes
-
+  - normal song deletion
 */
 
 class MyApp extends StatefulWidget {
@@ -142,7 +142,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 : mp3instance.metaTags['Title'].toString(),
             artist: mp3instance.metaTags['Artist'] == "null" ? "Unknown artist" : mp3instance.metaTags['Artist'],
             album: mp3instance.metaTags['Album'] == "null" ? "Unknown album" : mp3instance.metaTags['Album'],
-            // artwork: mp3instance.metaTags['APIC']['base64'],
+            // artwork: mp3instance.metaTags['APIC'][0],
           );
         } else {
           newSong = MusicData(
@@ -152,7 +152,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 : mp3instance.metaTags['Title'].toString(),
             artist: mp3instance.metaTags['Artist'] == "null" ? "Unknown artist" : mp3instance.metaTags['Artist'],
             album: mp3instance.metaTags['Album'] == "null" ? "Unknown album" : mp3instance.metaTags['Album'],
-            // artwork: mp3instance.metaTags['APIC']['base64'],
+            // artwork: mp3instance.metaTags['APIC'][0],
           );
         }
 

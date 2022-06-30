@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:marquee/marquee.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/widgets/common.dart';
 import 'package:music_app/notifiers/progress_notifier.dart';
@@ -79,21 +83,25 @@ class MusicView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(children: [
-                            Text(
-                              globals.pageManager.getCurrentSongData('title'),
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Gothic A1',
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 50,
+                              width: MediaQuery.of(context).size.width,
+                              child: Marquee(
+                                blankSpace: 80,
+                                velocity: 70,
+                                text: globals.pageManager.getCurrentSongData('title'),
+                                pauseAfterRound: const Duration(seconds: 2),
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Gothic A1',
+                                ),
                               ),
-                            )
-                          ]),
-                          Row(children: [
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(top: 13),
                               child: Text(
@@ -105,9 +113,9 @@ class MusicView extends StatelessWidget {
                                   fontFamily: 'Gothic A1',
                                 ),
                               ),
-                            )
-                          ]),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -186,12 +194,46 @@ class MusicView extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            IconButton(
+                            PopupMenuButton(
                               icon: const Icon(Icons.more_vert_rounded),
                               iconSize: 30,
-                              onPressed: () async {},
+                              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                                PopupMenuItem(
+                                  child: Row(
+                                    children: const [Icon(Icons.delete_outline), Text(' Delete song')],
+                                  ),
+                                  onTap: () {
+                                    File currentSong = File(globals.pageManager.playlistNotifier.value[globals.pageManager.getIndex()].songPath.path);
+
+                                    currentSong.delete().catchError(
+                                      (err) {
+                                        globals.showSnackBar(context, 'Error occured [$err]');
+                                      },
+                                    ).then((value) => globals.showSnackBar(context, 'Song deleted'));
+                                    globals.pageManager.onNextSongButtonPressed;
+                                  },
+                                ),
+                              ],
                             ),
-                            const Text("Next up: song1 • song 2 • song3 and 3 more")
+
+                            Flexible(
+                              child: ValueListenableBuilder(
+                                  valueListenable: globals.pageManager.currentSongTitleNotifier,
+                                  builder: (_, __, ___) {
+                                    int index = globals.pageManager.getIndex();
+                                    String text = globals.pageManager.playlistNotifier.value.length > index + 2
+                                        ? 'Next up: ${globals.pageManager.playlistNotifier.value[index + 1].title} and ${globals.pageManager.playlistNotifier.value.length - (index + 2)} more'
+                                        : globals.pageManager.playlistNotifier.value.length > index + 1
+                                            ? 'Next up: ${globals.pageManager.playlistNotifier.value[index + 1].title} '
+                                            : "";
+                                    return Text(
+                                      text,
+                                      overflow: TextOverflow.ellipsis,
+                                    );
+                                  }),
+                            ),
+
+                            // const Text(globals.pageManager.playlistNotifier.length > 0?"Next up: song1 • song 2 • song3 and 3 more")
                           ],
                         ),
                       ],
