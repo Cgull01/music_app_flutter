@@ -47,6 +47,7 @@ dependencies:
   on_audio_query: ^2.6.1
   flutter_native_splash: ^2.2.3+1
   azlistview: ^2.0.0
+  just_audio_background: ^0.0.1-beta.7
 
 
 dev_dependencies:

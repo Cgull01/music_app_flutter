@@ -18,8 +18,7 @@ import 'package:music_app/constants/routes.dart';
 import 'package:music_app/views/music_view.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:flutter_media_metadata/flutter_media_metadata.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 // FIRST: read and display music files, playlist names and stuff
 // Look into filemanager it uses permission_handler
@@ -61,9 +60,11 @@ FIRST:
   V add alphabet on music list view import 'package:alphabet_list_scroll_view/alphabet_list_scroll_view.dart';
   V be able to open different folders, FIX reading first folder somethings wrong with song count
   V add music deletion
-  O search bar
+  V search bar
   - external storage
-  - notification bar
+  O notification bar
+  Unhandled Exception: type 'MusicData' is not a subtype of type 'MediaItem' in type cast
+
   maybe test moving metadata to another async function, read first add metadata later, check speed if commented metadata
 SECOND:
   - images
@@ -82,7 +83,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-void main() {
+void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     systemNavigationBarColor: globals.colors['primary'], // navigation bar color
     systemNavigationBarIconBrightness: Brightness.light, //navigation bar icon
@@ -91,6 +92,11 @@ void main() {
     statusBarColor: Colors.transparent, // status bar color
     statusBarIconBrightness: Brightness.light, //status barIcon Brightness
   ));
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(const MyApp());
 }
 

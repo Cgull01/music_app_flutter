@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_app/globals.dart';
 import 'notifiers/play_button_notifier.dart';
 import 'notifiers/progress_notifier.dart';
@@ -43,6 +44,18 @@ class PageManager {
     _listenForChangesInBufferedPosition();
     _listenForChangesInTotalDuration();
     _listenForChangesInSequenceState();
+
+    AudioSource.uri(
+      Uri.parse('https://example.com/song1.mp3'),
+      tag: MediaItem(
+        // Specify a unique ID for each media item:
+        id: '1',
+        // Metadata to display in the notification:
+        album: "Album name",
+        title: "Song name",
+        artUri: Uri.parse('https://example.com/albumart.jpg'),
+      ),
+    );
   }
 
   void stop() {
