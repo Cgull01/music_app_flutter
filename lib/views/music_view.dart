@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
@@ -203,7 +202,7 @@ class MusicView extends StatelessWidget {
                                     children: const [Icon(Icons.delete_outline), Text(' Delete song')],
                                   ),
                                   onTap: () {
-                                    File currentSong = File(globals.pageManager.playlistNotifier.value[globals.pageManager.getIndex()].songPath.path);
+                                    File currentSong = File(globals.pageManager.playlistNotifier.value[globals.pageManager.getIndex()].id);
 
                                     currentSong.delete().catchError(
                                       (err) {

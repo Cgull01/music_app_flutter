@@ -2,7 +2,9 @@ library globals;
 
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_app/page_manager.dart';
 
 PageManager pageManager = PageManager();
@@ -25,7 +27,7 @@ Route createRoute(var view) {
   );
 }
 
-List<MusicData> allsongs = [];
+List<MediaItem> allsongs = [];
 
 List<Playlist> playLists = [];
 
@@ -35,24 +37,24 @@ final isLoading = ValueNotifier<bool>(true);
 
 late int removedSongIndex;
 
-class MusicData {
-  final FileSystemEntity songPath;
-  final String title;
-  final String? artist;
-  final String? album;
-  final String? artwork;
+// class MusicData {
+//   final FileSystemEntity songPath;
+//   final String title;
+//   final String? artist;
+//   final String? album;
+//   final String? artwork;
 
-  MusicData({
-    required this.songPath,
-    required this.title,
-    this.artist,
-    this.album,
-    this.artwork,
-  });
-}
+//   MusicData({
+//     required this.songPath,
+//     required this.title,
+//     this.artist,
+//     this.album,
+//     this.artwork,
+//   });
+// }
 
 class Playlist {
-  final List<MusicData> songs;
+  final List<MediaItem> songs;
   String title;
   Playlist({
     required this.title,
@@ -67,7 +69,7 @@ void showSnackBar(context, String message) {
       content: Text(
         message,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
       ),
       duration: const Duration(milliseconds: 500),
       width: 180.0, // Width of the SnackBar.

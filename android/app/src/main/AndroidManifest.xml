@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
    <application
         android:requestLegacyExternalStorage="true"
-        android:label="musicR_app"
+        android:label="Music player"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

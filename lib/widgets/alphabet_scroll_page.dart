@@ -1,13 +1,9 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:azlistview/azlistview.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_app/globals.dart' as globals;
-import 'package:music_app/views/music_list_viewer.dart';
 
 class _AZItem extends ISuspensionBean {
   final String title;
@@ -19,7 +15,7 @@ class _AZItem extends ISuspensionBean {
 }
 
 class AlphabetScrollPage extends StatefulWidget {
-  final List<globals.MusicData> items;
+  final List<MediaItem> items;
 
   const AlphabetScrollPage({
     Key? key,
@@ -78,7 +74,7 @@ class MusicTile extends StatelessWidget {
     required this.notifyParent,
   }) : super(key: key);
 
-  final globals.MusicData mData;
+  final MediaItem mData;
   final int index;
   final Function() notifyParent;
 
@@ -122,7 +118,7 @@ class MusicTile extends StatelessWidget {
                     children: const [Icon(Icons.delete_outline), Text(' Delete song')],
                   ),
                   onTap: () {
-                    File songToDelete = File(mData.songPath.path);
+                    File songToDelete = File(mData.id);
                     globals.activePlaylist.songs.removeAt(index);
                     songToDelete.delete().catchError(
                       (err) {

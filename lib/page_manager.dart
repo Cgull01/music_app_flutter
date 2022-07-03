@@ -1,17 +1,18 @@
 import 'dart:developer';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:music_app/globals.dart';
 import 'notifiers/play_button_notifier.dart';
 import 'notifiers/progress_notifier.dart';
 import 'notifiers/repeat_button_notifier.dart';
 import 'notifiers/queue_button_notifier.dart';
 import 'dart:developer' as dev_tools show log;
+import 'package:get_it/get_it.dart';
 
 class PageManager {
   final currentSongTitleNotifier = ValueNotifier<String>('');
-  final playlistNotifier = ValueNotifier<List<MusicData>>([]);
+  final playlistNotifier = ValueNotifier<List<MediaItem>>([]);
   final progressNotifier = ProgressNotifier();
   final repeatButtonNotifier = RepeatButtonNotifier();
   final isFirstSongNotifier = ValueNotifier<bool>(true);
@@ -44,32 +45,20 @@ class PageManager {
     _listenForChangesInBufferedPosition();
     _listenForChangesInTotalDuration();
     _listenForChangesInSequenceState();
-
-    AudioSource.uri(
-      Uri.parse('https://example.com/song1.mp3'),
-      tag: MediaItem(
-        // Specify a unique ID for each media item:
-        id: '1',
-        // Metadata to display in the notification:
-        album: "Album name",
-        title: "Song name",
-        artUri: Uri.parse('https://example.com/albumart.jpg'),
-      ),
-    );
   }
 
   void stop() {
     _audioPlayer.stop();
   }
 
-  void addToQueue(MusicData m) {
+  void addToQueue(MediaItem m) {
     dev_tools.log("added ${m.title} to queue");
 
     _playlist.insert(
         _playlist.length,
         AudioSource.uri(
-          m.songPath.uri,
-          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title, artist: m.artist ?? ''),
+          Uri.parse(m.id),
+          tag: MediaItem(id: m.id, title: m.title, artist: m.artist, album: m.album),
         ));
   }
 
@@ -77,7 +66,7 @@ class PageManager {
     return _audioPlayer.currentIndex ?? -1;
   }
 
-  void playSelectedSong(MusicData m) async {
+  void playSelectedSong(MediaItem m) async {
     dev_tools.log("playing ${m.title} index: ${getIndex()}");
     //_playlist.add(AudioSource.uri(m.songPath.uri));
     int index;
@@ -89,8 +78,8 @@ class PageManager {
     _playlist.insert(
         index,
         AudioSource.uri(
-          m.songPath.uri,
-          tag: MusicData(songPath: m.songPath, album: m.album ?? "", title: m.title, artist: m.artist ?? ''),
+          Uri.parse(m.id),
+          tag: MediaItem(id: m.id, title: m.title, artist: m.artist, album: m.album),
         ));
 
     await _audioPlayer.setAudioSource(_playlist);
@@ -101,13 +90,13 @@ class PageManager {
     }
   }
 
-  void setPlaylist(List<MusicData> P) async {
+  void setPlaylist(List<MediaItem> P) async {
     _playlist = ConcatenatingAudioSource(
       children: P
           .map(
             (item) => AudioSource.uri(
-              item.songPath.uri,
-              tag: MusicData(songPath: item.songPath, album: item.album ?? "", title: item.title, artist: item.artist ?? ''),
+              Uri.parse(item.id),
+              tag: MediaItem(id: item.id, title: item.title, artist: item.artist, album: item.album),
             ),
           )
           .toList(),
@@ -174,7 +163,7 @@ class PageManager {
 
       // update current song title
       final currentItem = sequenceState.currentSource;
-      final t = currentItem?.tag as MusicData;
+      final t = currentItem?.tag as MediaItem;
       currentSongTitleNotifier.value = t.title.toString();
 
       currentSongDataNotifier.value = {
@@ -185,11 +174,11 @@ class PageManager {
 
       // update playlist
       final playlist = sequenceState.effectiveSequence;
-      List<MusicData> titles = [];
+      List<MediaItem> titles = [];
       for (int i = 0; i < playlist.length; i++) {
         var p = playlist[i];
         if (p.tag != null) {
-          var c = p.tag as MusicData;
+          var c = p.tag as MediaItem;
 
           // if (i >= GetIndex()) {
           //   titles.add(c);
@@ -198,7 +187,6 @@ class PageManager {
         }
       }
 
-      //final titles = playlist.map((item) => item.tag as musicData).toList();
       // songs added in queue, i think
       playlistNotifier.value = titles;
 
@@ -218,10 +206,12 @@ class PageManager {
 
   void play() async {
     _audioPlayer.play();
+    log("${playButtonNotifier.value}");
   }
 
   void pause() {
     _audioPlayer.pause();
+    log("${playButtonNotifier.value}");
   }
 
   void seek(Duration position) {
@@ -262,7 +252,7 @@ class PageManager {
     await _audioPlayer.setShuffleModeEnabled(enable);
   }
 
-  void bringSongToQueueTop(int index, MusicData m) {
+  void bringSongToQueueTop(int index, MediaItem m) {
     dev_tools.log("moved ${m.title} to the top");
 
     _playlist.removeAt(index);

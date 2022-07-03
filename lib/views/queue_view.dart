@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
-import 'package:music_app/globals.dart';
 import 'package:music_app/notifiers/queue_button_notifier.dart';
 import '../globals.dart' as globals;
 
@@ -54,7 +54,7 @@ class PlaylistWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ValueListenableBuilder<List<MusicData>>(
+      child: ValueListenableBuilder<List<MediaItem>>(
         valueListenable: globals.pageManager.playlistNotifier,
         builder: (context, playlistTitles, _) {
           return ReorderableListView.builder(
@@ -97,7 +97,7 @@ class QueueTile extends StatelessWidget {
     required this.index,
   }) : super(key: key);
 
-  final MusicData mData;
+  final MediaItem mData;
   final int index;
   @override
   Widget build(BuildContext context) {

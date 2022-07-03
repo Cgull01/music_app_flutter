@@ -1,8 +1,7 @@
 import 'dart:core';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/diagnostics.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_app/widgets/alphabet_scroll_page.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;
@@ -109,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
 class MySearchDelegate extends SearchDelegate {
   // List<String> searchResults = ['asdf', 'aaaaa', 'lorema'];
 
-  List<globals.MusicData> searchResults2 = globals.allsongs;
+  List<MediaItem> searchResults2 = globals.allsongs;
 
   @override
   List<Widget>? buildActions(BuildContext context) => [
@@ -143,7 +142,7 @@ class MySearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<globals.MusicData> suggestions2 = searchResults2.where((searchResult) {
+    List<MediaItem> suggestions2 = searchResults2.where((searchResult) {
       final title = searchResult.title.toLowerCase();
       final artist = searchResult.artist?.toLowerCase() ?? "";
       final album = searchResult.album?.toLowerCase() ?? "";

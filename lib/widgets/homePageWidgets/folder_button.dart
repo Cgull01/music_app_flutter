@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:music_app/globals.dart' as globals;
 import 'package:music_app/views/music_list_viewer.dart';
@@ -17,9 +15,9 @@ class FolderButton extends StatelessWidget {
     globals.Playlist _playList = playList;
 
     return Container(
-      padding: EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        borderRadius: new BorderRadius.all(const Radius.circular(6.0)),
+      padding: const EdgeInsets.only(bottom: 8),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(6.0)),
 
         // border: Border(
         //   top: BorderSide(

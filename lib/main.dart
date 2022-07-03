@@ -3,7 +3,9 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:just_audio/just_audio.dart';
 import 'package:music_app/globals.dart';
+import 'package:music_app/notifiers/play_button_notifier.dart';
 import 'package:music_app/views/home_page.dart';
 import 'package:music_app/views/music_list_viewer.dart';
 import 'package:music_app/views/queue_view.dart';
@@ -19,6 +21,7 @@ import 'package:music_app/views/music_view.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:audio_service/audio_service.dart';
 
 // FIRST: read and display music files, playlist names and stuff
 // Look into filemanager it uses permission_handler
@@ -30,24 +33,24 @@ import 'package:just_audio_background/just_audio_background.dart';
 // potential fix: path_provider library
 
 //bottom_music_bar has delayed state update, BUT titlelistener works nice like wat
-// TODO: big text overflow, make audio control sizes normal V
-// TODO: maybe scrollable text V
-// TODO: progress bar at the bottom of screen V
-// TODO: queue button notifier, do like spotify, show that its pressed and pop screen if clicked again V
-// TODO: queue screen PROBLEMS with queue: can't select a song from queue without messing it all up,
+// : big text overflow, make audio control sizes normal V
+// : maybe scrollable text V
+// : progress bar at the bottom of screen V
+// : queue button notifier, do like spotify, show that its pressed and pop screen if clicked again V
+// : queue screen PROBLEMS with queue: can't select a song from queue without messing it all up,
 // Queue functions: move songs, select song to instantly play it and place below current song, delete songs from queue
 // Minimal queue functionality: show current song, remove songs
-// TODO: images
-// TODO: alphabet + sorting
-// TODO: queue
-// TODO: music CRUD and other controls
-// TODO: folder display info and screens
-// TODO: Search bar
-// TODO: localstorage with play amount, last queue, favorite
-// TODO: responsive ui
-// TODO: next up
-// TODO: redesign, extract color from albums
-// TODO: extternal storage
+// : images
+// : alphabet + sorting
+// : queue
+// : music CRUD and other controls
+// : folder display info and screens
+// : Search bar
+// : localstorage with play amount, last queue, favorite
+// : responsive ui
+// : next up
+// : redesign, extract color from albums
+// : extternal storage
 
 /*
 Focusing on wrong things:
@@ -62,10 +65,17 @@ FIRST:
   V add music deletion
   V search bar
   - external storage
-  O notification bar
-  Unhandled Exception: type 'MusicData' is not a subtype of type 'MediaItem' in type cast
 
-  maybe test moving metadata to another async function, read first add metadata later, check speed if commented metadata
+  V Clean code first before moving to notification bar
+  O notification bar
+
+  - maybe test moving metadata to another async function, 2) read first add metadata later, 1) check speed if commented metadata
+
+  stuff left from normally working music app:
+  - background activity
+  - notification bar
+  - external storage
+
 SECOND:
   - images
   - fully functional queue
@@ -93,10 +103,12 @@ void main() async {
     statusBarIconBrightness: Brightness.light, //status barIcon Brightness
   ));
   await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
+    androidStopForegroundOnPause: true,
+    notificationColor: globals.colors['primary'],
   );
+
   runApp(const MyApp());
 }
 
@@ -138,11 +150,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         String currentFolderTitle = entity.path.split('/').elementAt(entity.path.split('/').length - 2);
 
         final titleRegex = RegExp("([^/]+)/?\$");
-        MusicData newSong;
+        MediaItem newSong;
 
         if (mp3instance.parseTagsSync()) {
-          newSong = MusicData(
-            songPath: entity,
+          newSong = MediaItem(
+            id: entity.path,
             title: mp3instance.metaTags['Title'].toString() == "null"
                 ? titleRegex.firstMatch(entity.path)!.group(0).toString()
                 : mp3instance.metaTags['Title'].toString(),
@@ -151,8 +163,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             // artwork: mp3instance.metaTags['APIC'][0],
           );
         } else {
-          newSong = MusicData(
-            songPath: entity,
+          newSong = MediaItem(
+            id: entity.path,
             title: mp3instance.metaTags['Title'].toString() == "null"
                 ? titleRegex.firstMatch(entity.path)!.group(0).toString()
                 : mp3instance.metaTags['Title'].toString(),
