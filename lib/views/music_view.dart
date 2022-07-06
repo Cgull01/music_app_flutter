@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/widgets/common.dart';
 import 'package:music_app/notifiers/progress_notifier.dart';
@@ -14,6 +16,8 @@ class MusicView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: globals.colors['musicViewTop'],
@@ -34,7 +38,7 @@ class MusicView extends StatelessWidget {
         ),
       ),
       body: ValueListenableBuilder(
-        valueListenable: globals.pageManager.currentSongTitleNotifier,
+        valueListenable: pageManager.currentSongTitleNotifier,
         builder: (_, data, __) {
           return Column(
             children: [
@@ -92,7 +96,9 @@ class MusicView extends StatelessWidget {
                               child: Marquee(
                                 blankSpace: 80,
                                 velocity: 70,
-                                text: globals.pageManager.getCurrentSongData('title'),
+                                // text: pageManager.getCurrentSongData('title'),
+                                text: pageManager.currentSongDataNotifier.value['title'],
+
                                 pauseAfterRound: const Duration(seconds: 2),
                                 style: const TextStyle(
                                   fontSize: 32,
@@ -104,7 +110,7 @@ class MusicView extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(top: 13),
                               child: Text(
-                                globals.pageManager.getCurrentSongData('artist'),
+                                pageManager.currentSongDataNotifier.value['artist'],
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 16,
@@ -202,37 +208,37 @@ class MusicView extends StatelessWidget {
                                     children: const [Icon(Icons.delete_outline), Text(' Delete song')],
                                   ),
                                   onTap: () {
-                                    File currentSong = File(globals.pageManager.playlistNotifier.value[globals.pageManager.getIndex()].id);
+                                    // File currentSong = File(pageManager.playlistNotifier.value[pageManager.getIndex()].id);
 
-                                    currentSong.delete().catchError(
-                                      (err) {
-                                        globals.showSnackBar(context, 'Error occured [$err]');
-                                      },
-                                    ).then((value) => globals.showSnackBar(context, 'Song deleted'));
-                                    globals.pageManager.onNextSongButtonPressed;
+                                    // currentSong.delete().catchError(
+                                    //   (err) {
+                                    //     globals.showSnackBar(context, 'Error occured [$err]');
+                                    //   },
+                                    // ).then((value) => globals.showSnackBar(context, 'Song deleted'));
+                                    // pageManager.onNextSongButtonPressed;
                                   },
                                 ),
                               ],
                             ),
 
-                            Flexible(
-                              child: ValueListenableBuilder(
-                                  valueListenable: globals.pageManager.currentSongTitleNotifier,
-                                  builder: (_, __, ___) {
-                                    int index = globals.pageManager.getIndex();
-                                    String text = globals.pageManager.playlistNotifier.value.length > index + 2
-                                        ? 'Next up: ${globals.pageManager.playlistNotifier.value[index + 1].title} and ${globals.pageManager.playlistNotifier.value.length - (index + 2)} more'
-                                        : globals.pageManager.playlistNotifier.value.length > index + 1
-                                            ? 'Next up: ${globals.pageManager.playlistNotifier.value[index + 1].title} '
-                                            : "";
-                                    return Text(
-                                      text,
-                                      overflow: TextOverflow.ellipsis,
-                                    );
-                                  }),
-                            ),
+                            // Flexible(
+                            //   child: ValueListenableBuilder(
+                            //       valueListenable: pageManager.currentSongTitleNotifier,
+                            //       builder: (_, __, ___) {
+                            //         int index = pageManager.getIndex();
+                            //         String text = pageManager.playlistNotifier.value.length > index + 2
+                            //             ? 'Next up: ${pageManager.playlistNotifier.value[index + 1].title} and ${pageManager.playlistNotifier.value.length - (index + 2)} more'
+                            //             : pageManager.playlistNotifier.value.length > index + 1
+                            //                 ? 'Next up: ${pageManager.playlistNotifier.value[index + 1].title} '
+                            //                 : "";
+                            //         return Text(
+                            //           text,
+                            //           overflow: TextOverflow.ellipsis,
+                            //         );
+                            //       }),
+                            // ),
 
-                            // const Text(globals.pageManager.playlistNotifier.length > 0?"Next up: song1 • song 2 • song3 and 3 more")
+                            // const Text(pageManager.playlistNotifier.length > 0?"Next up: song1 • song 2 • song3 and 3 more")
                           ],
                         ),
                       ],
@@ -295,13 +301,15 @@ class AudioProgressBar extends StatelessWidget {
   const AudioProgressBar({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<ProgressBarState>(
-      valueListenable: globals.pageManager.progressNotifier,
+      valueListenable: pageManager.progressNotifier,
       builder: (_, value, __) {
         return SeekBar(
           position: value.current,
           duration: value.total,
-          onChangeEnd: globals.pageManager.seek,
+          onChangeEnd: pageManager.seek,
         );
       },
     );

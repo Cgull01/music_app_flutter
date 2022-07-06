@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_app/globals.dart';
 import 'package:music_app/notifiers/play_button_notifier.dart';
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 import 'package:music_app/views/home_page.dart';
 import 'package:music_app/views/music_list_viewer.dart';
 import 'package:music_app/views/queue_view.dart';
@@ -69,6 +71,10 @@ FIRST:
   V Clean code first before moving to notification bar
   O notification bar
 
+  !- currently broken things: queue view, play all songs, next up: view
+  ? - test notification bar or fix something
+
+
   - maybe test moving metadata to another async function, 2) read first add metadata later, 1) check speed if commented metadata
 
   stuff left from normally working music app:
@@ -94,6 +100,8 @@ class MyApp extends StatefulWidget {
 }
 
 void main() async {
+  await setupServiceLocator();
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     systemNavigationBarColor: globals.colors['primary'], // navigation bar color
     systemNavigationBarIconBrightness: Brightness.light, //navigation bar icon
@@ -102,12 +110,6 @@ void main() async {
     statusBarColor: Colors.transparent, // status bar color
     statusBarIconBrightness: Brightness.light, //status barIcon Brightness
   ));
-  await JustAudioBackground.init(
-    androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
-    androidStopForegroundOnPause: true,
-    notificationColor: globals.colors['primary'],
-  );
 
   runApp(const MyApp());
 }
@@ -116,6 +118,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late Image image1;
   @override
   void initState() {
+    getIt<PageManager>().init();
+
     super.initState();
     image1 = Image.asset(
       'assets/images/appLogo.png',
@@ -243,17 +247,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     // Release decoders and buffers back to the operating system making them
     // available for other apps to use.
-    globals.pageManager.dispose();
+    getIt<PageManager>().dispose();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive) {
       // Release the player's resources when not in use. We use "stop" so that
       // if the app resumes later, it will still remember what position to
       // resume from.
-      globals.pageManager.stop();
+      getIt<PageManager>().stop();
     }
   }
 

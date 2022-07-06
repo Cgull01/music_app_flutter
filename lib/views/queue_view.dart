@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/notifiers/queue_button_notifier.dart';
 import '../globals.dart' as globals;
@@ -9,9 +11,10 @@ class QueueView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
     return WillPopScope(
       onWillPop: () async {
-        globals.pageManager.queueButtonNotifier.value = QueueState.inactive;
+        pageManager.queueButtonNotifier.value = QueueState.inactive;
         return true;
       },
       child: Scaffold(
@@ -22,7 +25,7 @@ class QueueView extends StatelessWidget {
           flexibleSpace: GestureDetector(
             onPanUpdate: (details) {
               if (details.delta.dy > 0) {
-                globals.pageManager.queueButtonNotifier.value = QueueState.inactive;
+                pageManager.queueButtonNotifier.value = QueueState.inactive;
 
                 Navigator.pop(context);
               }
@@ -32,7 +35,7 @@ class QueueView extends StatelessWidget {
             icon: const Icon(Icons.keyboard_arrow_down),
             iconSize: 40,
             onPressed: () {
-              globals.pageManager.queueButtonNotifier.value = QueueState.inactive;
+              pageManager.queueButtonNotifier.value = QueueState.inactive;
               Navigator.pop(context);
             },
           ),
@@ -53,15 +56,17 @@ class PlaylistWidget extends StatelessWidget {
   const PlaylistWidget({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return Expanded(
       child: ValueListenableBuilder<List<MediaItem>>(
-        valueListenable: globals.pageManager.playlistNotifier,
+        valueListenable: pageManager.playlistNotifier,
         builder: (context, playlistTitles, _) {
           return ReorderableListView.builder(
             reverse: false,
             itemCount: playlistTitles.length,
             itemBuilder: (context, index) {
-              if (index < globals.pageManager.getIndex()) {
+              if (/*index < pageManager.getIndex()*/ false) {
                 return Divider(
                   key: Key('$index'),
                   height: 0,
@@ -70,12 +75,12 @@ class PlaylistWidget extends StatelessWidget {
                   endIndent: 30,
                   color: globals.colors['accent'],
                 );
-              } else if (index == 0) {
+              } else if (index == pageManager.getIndex()) {
                 return ListTile(
+                  tileColor: globals.colors['primary'],
                   key: Key('$index'),
-                  title: Text(globals.pageManager.currentSongDataNotifier.value['title'], overflow: TextOverflow.ellipsis),
-                  subtitle: Text(
-                      '${globals.pageManager.currentSongDataNotifier.value['artist']} - ${globals.pageManager.currentSongDataNotifier.value['album']}',
+                  title: Text(pageManager.currentSongDataNotifier.value['title'], overflow: TextOverflow.ellipsis),
+                  subtitle: Text('${pageManager.currentSongDataNotifier.value['artist']} - ${pageManager.currentSongDataNotifier.value['album']}',
                       overflow: TextOverflow.ellipsis),
                 );
               } else {
@@ -101,6 +106,8 @@ class QueueTile extends StatelessWidget {
   final int index;
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return Column(
       children: [
         Dismissible(
@@ -118,13 +125,13 @@ class QueueTile extends StatelessWidget {
           ),
           confirmDismiss: (direction) async {
             globals.showSnackBar(context, 'Removed from queue');
-            globals.pageManager.removeFromQueue(index);
+            pageManager.removeFromQueue(index);
             return false;
           },
           key: const ValueKey<int>(0),
           child: InkWell(
             onTap: (() async {
-              globals.pageManager.bringSongToQueueTop(index, mData);
+              pageManager.bringSongToQueueTop(index, mData);
             }),
             child: ListTile(
               title: Text(mData.title.toString(), overflow: TextOverflow.ellipsis),

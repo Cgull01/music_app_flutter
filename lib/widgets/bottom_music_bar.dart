@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 import 'package:music_app/widgets/common.dart' show PlayButton, NextSongButton;
 import 'package:music_app/views/music_view.dart';
 import 'package:music_app/notifiers/progress_notifier.dart';
@@ -13,8 +15,10 @@ class BottomMusicBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: globals.pageManager.currentSongTitleNotifier,
+    final pageManager = getIt<PageManager>();
+
+    return ValueListenableBuilder<Map>(
+      valueListenable: pageManager.currentSongDataNotifier,
       builder: (_, data, __) {
         return BottomAppBar(
           child: GestureDetector(
@@ -33,7 +37,7 @@ class BottomMusicBar extends StatelessWidget {
               child: Column(
                 children: [
                   ValueListenableBuilder<ProgressBarState>(
-                    valueListenable: globals.pageManager.progressNotifier,
+                    valueListenable: pageManager.progressNotifier,
                     builder: (_, value, __) {
                       return LinearProgressIndicator(
                         color: globals.colors['visual'],
@@ -69,7 +73,7 @@ class BottomMusicBar extends StatelessWidget {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 5),
                                   child: Text(
-                                    globals.pageManager.getCurrentSongData('title'),
+                                    data['title'],
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 20,
@@ -78,7 +82,7 @@ class BottomMusicBar extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  globals.pageManager.getCurrentSongData('artist'),
+                                  data['artist'],
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
@@ -124,8 +128,10 @@ class QueueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<QueueState>(
-        valueListenable: globals.pageManager.queueButtonNotifier,
+        valueListenable: pageManager.queueButtonNotifier,
         builder: (_, isActive, __) {
           switch (isActive) {
             case QueueState.active:
@@ -134,7 +140,7 @@ class QueueButton extends StatelessWidget {
                 highlightColor: Colors.transparent,
                 color: globals.colors['toggle'],
                 onPressed: () {
-                  globals.pageManager.queueButtonNotifier.value = QueueState.inactive;
+                  pageManager.queueButtonNotifier.value = QueueState.inactive;
                   Navigator.pop(context);
                 },
                 icon: const Icon(Icons.queue_music_rounded),
@@ -146,7 +152,7 @@ class QueueButton extends StatelessWidget {
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onPressed: () {
-                  globals.pageManager.queueButtonNotifier.value = QueueState.active;
+                  pageManager.queueButtonNotifier.value = QueueState.active;
                   Navigator.push(context, globals.createRoute(const QueueView()));
                 },
                 icon: const Icon(Icons.queue_music_rounded),

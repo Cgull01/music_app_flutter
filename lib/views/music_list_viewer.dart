@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 import 'package:music_app/widgets/alphabet_scroll_page.dart';
 import 'package:music_app/widgets/bottom_music_bar.dart';
 import 'package:music_app/globals.dart' as globals;
@@ -24,6 +26,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
   Widget build(BuildContext context) {
     List<MediaItem> _songList = widget.songList;
     String _playListTitle = widget.playListTitle;
+    final pageManager = getIt<PageManager>();
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +55,7 @@ class _MusicListViewerState extends State<MusicListViewer> {
             alignment: Alignment.centerLeft,
             child: InkWell(
               onTap: () {
-                globals.pageManager.setPlaylist(_songList);
+                pageManager.setPlaylist(_songList);
               },
               child: Padding(
                 padding: const EdgeInsets.all(16.0),

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:music_app/globals.dart' as globals;
 import 'package:music_app/notifiers/play_button_notifier.dart';
 import 'package:music_app/notifiers/repeat_button_notifier.dart';
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 
 class SeekBar extends StatefulWidget {
   final Duration duration;
@@ -188,15 +190,17 @@ class PreviousSongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<bool>(
-      valueListenable: globals.pageManager.isFirstSongNotifier,
+      valueListenable: pageManager.isFirstSongNotifier,
       builder: (_, isFirst, __) {
         return IconButton(
           icon: Icon(
             Icons.skip_previous,
             size: iconSize,
           ),
-          onPressed: (isFirst) ? null : globals.pageManager.onPreviousSongButtonPressed,
+          onPressed: (isFirst) ? null : pageManager.previous,
         );
       },
     );
@@ -212,8 +216,10 @@ class PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<ButtonState>(
-      valueListenable: globals.pageManager.playButtonNotifier,
+      valueListenable: pageManager.playButtonNotifier,
       builder: (_, value, __) {
         switch (value) {
           case ButtonState.loading:
@@ -227,13 +233,13 @@ class PlayButton extends StatelessWidget {
             return IconButton(
               icon: const Icon(Icons.play_arrow_rounded),
               iconSize: iconSize,
-              onPressed: globals.pageManager.play,
+              onPressed: pageManager.play,
             );
           case ButtonState.playing:
             return IconButton(
               icon: const Icon(Icons.pause),
               iconSize: iconSize,
-              onPressed: globals.pageManager.pause,
+              onPressed: pageManager.pause,
             );
         }
       },
@@ -250,12 +256,14 @@ class NextSongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<bool>(
-      valueListenable: globals.pageManager.isLastSongNotifier,
+      valueListenable: pageManager.isLastSongNotifier,
       builder: (_, isLast, __) {
         return IconButton(
           icon: Icon(Icons.skip_next_rounded, size: iconSize),
-          onPressed: (isLast) ? null : globals.pageManager.onNextSongButtonPressed,
+          onPressed: (isLast) ? null : pageManager.next,
         );
       },
     );
@@ -271,8 +279,10 @@ class ShuffleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<bool>(
-      valueListenable: globals.pageManager.isShuffleModeEnabledNotifier,
+      valueListenable: pageManager.isShuffleModeEnabledNotifier,
       builder: (context, isEnabled, child) {
         return IconButton(
           icon: (isEnabled)
@@ -281,7 +291,7 @@ class ShuffleButton extends StatelessWidget {
                   Icons.shuffle_rounded,
                   color: globals.colors['accent'],
                 ),
-          onPressed: globals.pageManager.onShuffleButtonPressed,
+          onPressed: pageManager.shuffle,
         );
       },
     );
@@ -295,8 +305,10 @@ class CurrentSongTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<String>(
-      valueListenable: globals.pageManager.currentSongTitleNotifier,
+      valueListenable: pageManager.currentSongTitleNotifier,
       builder: (_, title, __) {
         return Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -313,8 +325,10 @@ class RepeatButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return ValueListenableBuilder<RepeatState>(
-      valueListenable: globals.pageManager.repeatButtonNotifier,
+      valueListenable: pageManager.repeatButtonNotifier,
       builder: (context, value, child) {
         Icon icon;
         switch (value) {
@@ -340,7 +354,7 @@ class RepeatButton extends StatelessWidget {
         }
         return IconButton(
           icon: icon,
-          onPressed: globals.pageManager.onRepeatButtonPressed,
+          onPressed: pageManager.repeat,
         );
       },
     );

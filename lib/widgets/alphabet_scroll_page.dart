@@ -4,6 +4,8 @@ import 'package:azlistview/azlistview.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_app/globals.dart' as globals;
+import 'package:music_app/page_manager.dart';
+import 'package:music_app/service_locator.dart';
 
 class _AZItem extends ISuspensionBean {
   final String title;
@@ -80,6 +82,8 @@ class MusicTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+
     return Column(
       children: [
         Dismissible(
@@ -100,14 +104,14 @@ class MusicTile extends StatelessWidget {
             ),
           ),
           confirmDismiss: (direction) async {
-            globals.pageManager.addToQueue(mData);
+            pageManager.addToQueue(mData);
             globals.showSnackBar(context, 'Added to queue');
             return false;
           },
           key: const ValueKey<int>(0),
           child: ListTile(
             onTap: () async {
-              globals.pageManager.playSelectedSong(mData);
+              pageManager.playSelectedSong(mData);
             },
             title: Text(mData.title.toString(), overflow: TextOverflow.ellipsis),
             trailing: PopupMenuButton(
